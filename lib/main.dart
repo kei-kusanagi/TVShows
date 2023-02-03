@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tv_show/screens/Favorites.dart';
 import 'screens/TvShowScreen.dart';
 
 void main() {
@@ -13,6 +14,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: TvShow(),
+      // home: Scaffold(
+      //   body: PageView(
+      //     children: <Widget>[
+      //       TvShow(),
+      //       Favorites(),
+      //     ]
+      //   )
+      // )
     );
   }
 }
