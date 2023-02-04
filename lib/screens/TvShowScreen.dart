@@ -1,16 +1,37 @@
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:tv_show/screens/Favorites.dart';
+import 'package:tv_show/api/api.dart';
+import 'package:http/http.dart' as http;
 
 class TvShow extends StatefulWidget {
   const TvShow({Key? key}) : super(key: key);
-
-  @override
+    @override
   State<TvShow> createState() => _TvShowState();
 }
 
 class _TvShowState extends State<TvShow> {
+  
+  // Future<List<Gif>> _listadoGifs;
 
+  Future <List<Gif>?> getGifs() async {
+    final response = await http.get(
+        "https://api.giphy.com/v1/gifs/trending?api_key=GbT1BcYH7nEBK6r9bcmLwWIXLQKB1kTc&limit=10&rating=g" as Uri);
+
+    if (response.statusCode == 200){
+      print(response.body);
+      return null;
+    } else {
+      throw Exception("F en el chat");
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getGifs();
+  }
 
   final List<TVshow> TVShows =[
     TVshow('The Last of Us', 'tt3581920', 9.3, 'https://m.media-amazon.com/images/M/MV5BZGUzYTI3M2EtZmM0Yy00NGUyLWI4ODEtN2Q3ZGJlYzhhZjU3XkEyXkFqcGdeQXVyNTM0OTY1OQ@@._V1_UX67_CR0,0,67,98_AL_.jpg'),
@@ -21,12 +42,14 @@ class _TvShowState extends State<TvShow> {
     TVshow('Mission Majnu', 'tt13131232', 7.9,'https://m.media-amazon.com/images/M/MV5BYTYwYmI0NGItYmFkYi00NzViLWIwMGEtNGNjYjQwYjY1NTQ1XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_QL75_UY414_CR26,0,280,414_.jpg'),
   ];
 
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Tv Show'),
+          title: const Text("Tv Show's 🖥"),
           backgroundColor: Colors.purple,
         ),
         bottomNavigationBar: BottomAppBar(
@@ -42,14 +65,14 @@ class _TvShowState extends State<TvShow> {
                       MaterialPageRoute(builder: (context) => TvShow()),
                     );
                   },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const <Widget>[
-                        Icon(Icons.tv),
-                        SizedBox(width: 10),
-                        Text("TV Show's"),
-                      ],
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const <Widget>[
+                      Icon(Icons.tv),
+                      SizedBox(width: 10,height: 50,),
+                      Text("TV Show's"),
+                    ],
+                  ),
                 ),
               ),
               Expanded(
@@ -65,7 +88,7 @@ class _TvShowState extends State<TvShow> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const <Widget>[
                       Icon(Icons.favorite),
-                      SizedBox(width: 10),
+                      SizedBox(width: 10,height: 50,),
                       Text("Favoritos"),
                     ],
                   ),
@@ -79,20 +102,6 @@ class _TvShowState extends State<TvShow> {
           itemBuilder: (context, index){
               return Slidable(
                 key: Key(TVShows[index].toString()),
-                startActionPane: ActionPane(
-                  motion: ScrollMotion(),
-                  children: [
-                    SlidableAction(
-                      onPressed: (BuildContext context) {
-                        deleteTVshow(context, TVShows[index]);
-                      },
-                      backgroundColor: Color(0xFFFE4A49),
-                      foregroundColor: Colors.white,
-                      icon: Icons.delete,
-                      label: 'Delete',
-                    ),
-                  ],
-                ),
                 endActionPane: const ActionPane(
                   motion: ScrollMotion(),
                   children: [
@@ -107,23 +116,32 @@ class _TvShowState extends State<TvShow> {
                 ),
                 child: ListTile(
                   onTap: (){
-                    print(TVShows[index].name);
-                },
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(TVShows[index].ImageLink),
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Mensaje"),
+                          content: Text("desplegar pantalla de detalles"),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text("Cerrar"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                  },
+                  leading: Image(
+                     image: NetworkImage(TVShows[index].ImageLink),
                   ),
                   title: Text(TVShows[index].name),
                   subtitle: Text(TVShows[index].IMDb),
                   trailing:
                   const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey),
-                  // Row(
-                  //   mainAxisSize: MainAxisSize.min,
-                  //   children: [
-                  //     const Icon(Icons.star, color: Colors.yellow),
-                  //     const SizedBox(width: 5),
-                  //     Text(_TVShows[index].Rating.toString()),
-                  //   ],
-                  // ),
                 ),
               );
             },

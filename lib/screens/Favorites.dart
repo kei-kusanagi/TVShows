@@ -24,7 +24,7 @@ class _FavoritesState extends State<Favorites> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Tv Show'),
+          title: const Text('Favoritos ⭐'),
           backgroundColor: Colors.purple,
         ),
         bottomNavigationBar: BottomAppBar(
@@ -104,7 +104,23 @@ class _FavoritesState extends State<Favorites> {
               ),
               child: ListTile(
                 onTap: () {
-                  // print(TVShows[index].name);
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Mensaje"),
+                        content: Text("desplegar pantalla de detalles"),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text("Cerrar"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 },
                 leading: CircleAvatar(
                   backgroundImage: NetworkImage(TVShows[index].ImageLink),
