@@ -11,15 +11,15 @@ class TvShow extends StatefulWidget {
 }
 
 class _TvShowState extends State<TvShow> {
+  String urlString = "https://api.giphy.com/v1/gifs/trending?api_key=GbT1BcYH7nEBK6r9bcmLwWIXLQKB1kTc&limit=10&rating=g";
   
   // Future<List<Gif>> _listadoGifs;
 
   Future <List<Gif>?> getGifs() async {
-    final response = await http.get(
-        "https://api.giphy.com/v1/gifs/trending?api_key=GbT1BcYH7nEBK6r9bcmLwWIXLQKB1kTc&limit=10&rating=g" as Uri);
+    final response = await http.get(Uri.parse(urlString));
 
     if (response.statusCode == 200){
-      print(response.body);
+      print("${response.body}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
       return null;
     } else {
       throw Exception("F en el chat");
@@ -156,7 +156,7 @@ class _TvShowState extends State<TvShow> {
       builder: ( BuildContext context)  {
         return AlertDialog(
           title: Text("Eliminar Show"),
-          content:  Text("¿Esta seguro de querer eliminar a " + TVshow.name + '?'),
+          content:  Text('${"¿Esta seguro de querer eliminar a " + TVshow.name}?'),
           actions: [
             TextButton(onPressed: (){
               Navigator.pop(context);
