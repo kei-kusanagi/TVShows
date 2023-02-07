@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:tv_show/screens/Favorites.dart';
 import 'package:tv_show/api/api.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert' show jsonDecode, utf8;
 
 class TvShow extends StatefulWidget {
   const TvShow({Key? key}) : super(key: key);
@@ -13,14 +14,24 @@ class TvShow extends StatefulWidget {
 class _TvShowState extends State<TvShow> {
   String urlString = "https://api.giphy.com/v1/gifs/trending?api_key=GbT1BcYH7nEBK6r9bcmLwWIXLQKB1kTc&limit=10&rating=g";
   
-  // Future<List<Gif>> _listadoGifs;
+  late Future<List<Gif>?> _listadoGifs;
 
   Future <List<Gif>?> getGifs() async {
     final response = await http.get(Uri.parse(urlString));
 
+    List<Gif> gifs = [];
+
     if (response.statusCode == 200){
-      print("${response.body}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-      return null;
+
+      String body = utf8.decode(response.bodyBytes);
+
+      final jsonData = jsonDecode(body);
+      for (var item in jsonData["data"]){
+        gifs.add(
+          Gif(item["title"], item["images"]["downsized"]["url"])
+        );
+      }
+    return gifs;
     } else {
       throw Exception("F en el chat");
     }
@@ -30,7 +41,7 @@ class _TvShowState extends State<TvShow> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getGifs();
+    _listadoGifs = getGifs();
   }
 
   final List<TVshow> TVShows =[
