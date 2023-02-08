@@ -8,10 +8,10 @@ import 'dart:convert' show jsonDecode, utf8;
 class TvShow extends StatefulWidget {
   const TvShow({Key? key}) : super(key: key);
     @override
-  State<TvShow> createState() => _TvShowState();
+  State<TvShow> createState() => TvShowState();
 }
 
-class _TvShowState extends State<TvShow> {
+class TvShowState extends State<TvShow> {
   String urlString = "https://api.giphy.com/v1/gifs/trending?api_key=GbT1BcYH7nEBK6r9bcmLwWIXLQKB1kTc&limit=10&rating=g";
   
   late Future<List<Gif>?> _listadoGifs;
@@ -108,54 +108,69 @@ class _TvShowState extends State<TvShow> {
             ],
           ),
         ),
-        body: ListView.builder(
-          itemCount: TVShows.length,
-          itemBuilder: (context, index){
-              return Slidable(
-                key: Key(TVShows[index].toString()),
-                endActionPane: const ActionPane(
-                  motion: ScrollMotion(),
-                  children: [
-                    SlidableAction(
-                      onPressed: doNothing,
-                      backgroundColor: Colors.yellow,
-                      foregroundColor: Colors.black,
-                      icon: Icons.save,
-                      label: 'Añadir a Favoritos',
-                    ),
-                  ],
-                ),
-                child: ListTile(
-                  onTap: (){
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text("Mensaje"),
-                          content: Text("desplegar pantalla de detalles"),
-                          actions: <Widget>[
-                            TextButton(
-                              child: Text("Cerrar"),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
+        body: FutureBuilder(
+          future: _listadoGifs,
+          builder: (context, snapshot) {
+            if (snapshot.hasData){
+              return GridView.count(
+                crossAxisCount: 2,
 
-                  },
-                  leading: Image(
-                     image: NetworkImage(TVShows[index].ImageLink),
-                  ),
-                  title: Text(TVShows[index].name),
-                  subtitle: Text(TVShows[index].IMDb),
-                  trailing:
-                  const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey),
-                ),
+                children: _listGifs(snapshot.data),
               );
-            },
+            } else if (snapshot.hasError){
+              print(snapshot.error);
+              return Text("Error");
+            }
+            return ListView.builder(
+              itemCount: TVShows.length,
+              itemBuilder: (context, index){
+                  return Slidable(
+                    key: Key(TVShows[index].toString()),
+                    endActionPane: const ActionPane(
+                      motion: ScrollMotion(),
+                      children: [
+                        SlidableAction(
+                          onPressed: doNothing,
+                          backgroundColor: Colors.yellow,
+                          foregroundColor: Colors.black,
+                          icon: Icons.save,
+                          label: 'Añadir a Favoritos',
+                        ),
+                      ],
+                    ),
+                    child: ListTile(
+                      onTap: (){
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Mensaje"),
+                              content: Text("desplegar pantalla de detalles"),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text("Cerrar"),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                      },
+                      leading: Image(
+                         image: NetworkImage(TVShows[index].ImageLink),
+                      ),
+                      title: Text(TVShows[index].name),
+                      subtitle: Text(TVShows[index].IMDb),
+                      trailing:
+                      const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey),
+                    ),
+                  );
+                },
+            );
+          }
         ),
       ),
 
@@ -184,6 +199,25 @@ class _TvShowState extends State<TvShow> {
         );
       },
     );
+  }
+  List<Widget> _listGifs(data){
+    List<Widget> gifs = [];
+
+    for (var gif in data) {
+      gifs.add(
+        Card(child:
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Expanded(child: Image.network(gif.url, fit: BoxFit.fill,)),
+
+            ],
+          ),
+        ))
+      );
+    }
+    return gifs;
   }
 }
 
