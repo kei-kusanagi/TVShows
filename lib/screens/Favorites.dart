@@ -9,7 +9,7 @@ class Favorites extends StatefulWidget {
   State<Favorites> createState() => _FavoritesState();
 }
 
-final favorites = [];
+List<Show> favorites = [];
 
 class _FavoritesState extends State<Favorites> {
   // final List<TVshow> TVShows = [
