@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'TvShowScreen.dart';
 
-
 class Favorites extends StatefulWidget {
   const Favorites({Key? key}) : super(key: key);
 
@@ -10,14 +9,19 @@ class Favorites extends StatefulWidget {
   State<Favorites> createState() => _FavoritesState();
 }
 
-class _FavoritesState extends State<Favorites> {
-  final List<TVshow> TVShows =[
-    TVshow('The Last of Us', 'tt3581920', 9.3, 'https://m.media-amazon.com/images/M/MV5BZGUzYTI3M2EtZmM0Yy00NGUyLWI4ODEtN2Q3ZGJlYzhhZjU3XkEyXkFqcGdeQXVyNTM0OTY1OQ@@._V1_UX67_CR0,0,67,98_AL_.jpg'),
-    TVshow('TOP GUN MAVERICK', 'tt1745960', 8.3,'https://m.media-amazon.com/images/M/MV5BZWYzOGEwNTgtNWU3NS00ZTQ0LWJkODUtMmVhMjIwMjA1ZmQwXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_QL75_UX280_CR0,0,280,414_.jpg'),
-    TVshow('Avatar: El sentido del agua', 'tt1630029', 7.8,'https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjQxNTE1MDA@._V1_QL75_UY414_CR5,0,280,414_.jpg'),
-    TVshow('Miercoles', 'tt13443470', 8.2,'https://m.media-amazon.com/images/M/MV5BMjllNDU5YjAtOGM1Zi00ZTRiLWI0OWItYjc5ZmUxODBiYTJmXkEyXkFqcGdeQXVyMTU2Mjg2NjE2._V1_QL75_UX280_CR0,0,280,414_.jpg'),
+final favorites = [];
 
-  ];
+class _FavoritesState extends State<Favorites> {
+  // final List<TVshow> TVShows = [
+  //   TVshow('The Last of Us', 'tt3581920', 9.3,
+  //       'https://m.media-amazon.com/images/M/MV5BZGUzYTI3M2EtZmM0Yy00NGUyLWI4ODEtN2Q3ZGJlYzhhZjU3XkEyXkFqcGdeQXVyNTM0OTY1OQ@@._V1_UX67_CR0,0,67,98_AL_.jpg'),
+  //   TVshow('TOP GUN MAVERICK', 'tt1745960', 8.3,
+  //       'https://m.media-amazon.com/images/M/MV5BZWYzOGEwNTgtNWU3NS00ZTQ0LWJkODUtMmVhMjIwMjA1ZmQwXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_QL75_UX280_CR0,0,280,414_.jpg'),
+  //   TVshow('Avatar: El sentido del agua', 'tt1630029', 7.8,
+  //       'https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjQxNTE1MDA@._V1_QL75_UY414_CR5,0,280,414_.jpg'),
+  //   TVshow('Miercoles', 'tt13443470', 8.2,
+  //       'https://m.media-amazon.com/images/M/MV5BMjllNDU5YjAtOGM1Zi00ZTRiLWI0OWItYjc5ZmUxODBiYTJmXkEyXkFqcGdeQXVyMTU2Mjg2NjE2._V1_QL75_UX280_CR0,0,280,414_.jpg'),
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +37,8 @@ class _FavoritesState extends State<Favorites> {
             children: <Widget>[
               Expanded(
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple),
+                  style:
+                      ElevatedButton.styleFrom(backgroundColor: Colors.purple),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -53,8 +57,8 @@ class _FavoritesState extends State<Favorites> {
               ),
               Expanded(
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple),
+                  style:
+                      ElevatedButton.styleFrom(backgroundColor: Colors.purple),
                   onPressed: () {
                     // acción del segundo botón
                   },
@@ -72,16 +76,16 @@ class _FavoritesState extends State<Favorites> {
           ),
         ),
         body: ListView.builder(
-          itemCount: TVShows.length,
+          itemCount: favorites.length,
           itemBuilder: (context, index) {
             return Slidable(
-              key: Key(TVShows[index].toString()),
+              key: Key(favorites[index].toString()),
               startActionPane: ActionPane(
                 motion: ScrollMotion(),
                 children: [
                   SlidableAction(
                     onPressed: (BuildContext context) {
-                      deleteTVshow(context, TVShows[index]);
+                      deleteTVshow(context, favorites[index]);
                     },
                     backgroundColor: Color(0xFFFE4A49),
                     foregroundColor: Colors.white,
@@ -123,18 +127,18 @@ class _FavoritesState extends State<Favorites> {
                   );
                 },
                 leading: CircleAvatar(
-                  backgroundImage: NetworkImage(TVShows[index].ImageLink),
+                  backgroundImage: NetworkImage(favorites[index].image),
                 ),
-                title: Text(TVShows[index].name),
-                subtitle: Text(TVShows[index].IMDb),
+                title: Text(favorites[index].name),
+                subtitle: Text(favorites[index].imdb),
                 trailing:
-                // const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey),
-                Row(
+                    // const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey),
+                    Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.star, color: Colors.yellow),
                     const SizedBox(width: 5),
-                    Text(TVShows[index].Rating.toString()),
+                    Text(favorites[index].rating.toString()),
                   ],
                 ),
               ),
@@ -142,28 +146,40 @@ class _FavoritesState extends State<Favorites> {
           },
         ),
       ),
-
     );
   }
-  void deleteTVshow(BuildContext context, TVshow){
+
+  void deleteTVshow(BuildContext context, TVshow) {
     showDialog(
       context: context,
-      builder: ( BuildContext context)  {
+      builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Eliminar Show"),
-          content:  Text("¿Esta seguro de querer eliminar a " + TVshow.name + '?'),
+          content:
+              Text("¿Esta seguro de querer eliminar a " + TVshow.name + '?'),
           actions: [
-            TextButton(onPressed: (){
-              Navigator.pop(context);
-            }, child:Text('Cancelar',),),
-            TextButton(onPressed: (){
-              if (mounted) {
-                setState(() {
-                  TVShows.remove(TVshow);
-                });
-              }
-              Navigator.pop(context);
-            }, child:Text('Borrar', style: TextStyle(color: Colors.red),),),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                'Cancelar',
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                if (mounted) {
+                  setState(() {
+                    favorites.remove(TVshow);
+                  });
+                }
+                Navigator.pop(context);
+              },
+              child: Text(
+                'Borrar',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
           ],
         );
       },
