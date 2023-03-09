@@ -12,17 +12,6 @@ class Favorites extends StatefulWidget {
 List<Show> favorites = [];
 
 class _FavoritesState extends State<Favorites> {
-  // final List<TVshow> TVShows = [
-  //   TVshow('The Last of Us', 'tt3581920', 9.3,
-  //       'https://m.media-amazon.com/images/M/MV5BZGUzYTI3M2EtZmM0Yy00NGUyLWI4ODEtN2Q3ZGJlYzhhZjU3XkEyXkFqcGdeQXVyNTM0OTY1OQ@@._V1_UX67_CR0,0,67,98_AL_.jpg'),
-  //   TVshow('TOP GUN MAVERICK', 'tt1745960', 8.3,
-  //       'https://m.media-amazon.com/images/M/MV5BZWYzOGEwNTgtNWU3NS00ZTQ0LWJkODUtMmVhMjIwMjA1ZmQwXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_QL75_UX280_CR0,0,280,414_.jpg'),
-  //   TVshow('Avatar: El sentido del agua', 'tt1630029', 7.8,
-  //       'https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjQxNTE1MDA@._V1_QL75_UY414_CR5,0,280,414_.jpg'),
-  //   TVshow('Miercoles', 'tt13443470', 8.2,
-  //       'https://m.media-amazon.com/images/M/MV5BMjllNDU5YjAtOGM1Zi00ZTRiLWI0OWItYjc5ZmUxODBiYTJmXkEyXkFqcGdeQXVyMTU2Mjg2NjE2._V1_QL75_UX280_CR0,0,280,414_.jpg'),
-  // ];
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -80,7 +69,7 @@ class _FavoritesState extends State<Favorites> {
           itemBuilder: (context, index) {
             return Slidable(
               key: Key(favorites[index].toString()),
-              startActionPane: ActionPane(
+              endActionPane: ActionPane(
                 motion: ScrollMotion(),
                 children: [
                   SlidableAction(
@@ -94,18 +83,18 @@ class _FavoritesState extends State<Favorites> {
                   ),
                 ],
               ),
-              endActionPane: const ActionPane(
-                motion: ScrollMotion(),
-                children: [
-                  SlidableAction(
-                    onPressed: doNothing,
-                    backgroundColor: Colors.yellow,
-                    foregroundColor: Colors.black,
-                    icon: Icons.save,
-                    label: 'Añadir a Favoritos',
-                  ),
-                ],
-              ),
+              // endActionPane: const ActionPane(
+              //   motion: ScrollMotion(),
+              //   children: [
+              //     SlidableAction(
+              //       onPressed: doNothing,
+              //       backgroundColor: Colors.yellow,
+              //       foregroundColor: Colors.black,
+              //       icon: Icons.save,
+              //       label: 'Añadir a Favoritos',
+              //     ),
+              //   ],
+              // ),
               child: ListTile(
                 onTap: () {
                   showDialog(

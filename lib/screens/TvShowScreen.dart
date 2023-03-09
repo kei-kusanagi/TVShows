@@ -1,9 +1,9 @@
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:tv_show/screens/Favorites.dart';
-import 'package:tv_show/api/api.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert' show jsonDecode, utf8;
+// import 'package:tv_show/api/api.dart';
+// import 'package:http/http.dart' as http;
+// import 'dart:convert' show jsonDecode, utf8;
 
 class TvShow extends StatefulWidget {
   const TvShow({Key? key}) : super(key: key);
@@ -15,31 +15,22 @@ class TvShowState extends State<TvShow> {
   String urlString =
       "https://api.giphy.com/v1/gifs/trending?api_key=GbT1BcYH7nEBK6r9bcmLwWIXLQKB1kTc&limit=10&rating=g";
 
-  // late Future<List<Gif>?> _listadoGifs;
-
-  Future<List<Gif>?> getGifs() async {
-    final response = await http.get(Uri.parse(urlString));
-
-    List<Gif> gifs = [];
-
-    if (response.statusCode == 200) {
-      String body = utf8.decode(response.bodyBytes);
-
-      final jsonData = jsonDecode(body);
-      for (var item in jsonData["data"]) {
-        gifs.add(Gif(item["title"], item["images"]["downsized"]["url"]));
-      }
-      return gifs;
-    } else {
-      throw Exception("F en el chat");
-    }
-  }
-
-  // @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   super.initState();
-  //   _listadoGifs = getGifs();
+  // Future<List<Gif>?> getGifs() async {
+  //   final response = await http.get(Uri.parse(urlString));
+  //
+  //   List<Gif> gifs = [];
+  //
+  //   if (response.statusCode == 200) {
+  //     String body = utf8.decode(response.bodyBytes);
+  //
+  //     final jsonData = jsonDecode(body);
+  //     for (var item in jsonData["data"]) {
+  //       gifs.add(Gif(item["title"], item["images"]["downsized"]["url"]));
+  //     }
+  //     return gifs;
+  //   } else {
+  //     throw Exception("F en el chat");
+  //   }
   // }
 
   List<Show> shows = [
@@ -147,7 +138,6 @@ class TvShowState extends State<TvShow> {
           if (snapshot.hasData) {
             return GridView.count(
               crossAxisCount: 2,
-              // children: _listGifs(snapshot.data),
             );
           } else if (snapshot.hasError) {
             print(snapshot.error);
@@ -163,11 +153,28 @@ class TvShowState extends State<TvShow> {
                   children: [
                     SlidableAction(
                       onPressed: (BuildContext context) {
-                        setState(() {
-                          favorites.add(shows[index]);
-                        });
+                        setState(
+                          () {
+                            var check = shows[index].imdb;
+                            if (!favorites.contains(check)) {
+                              print('se agrego');
+                              print(check);
+                              favorites.forEach((show) => print(show.imdb));
+                              favorites.add(shows[index]);
+                            } else {
+                              print('NO se agrego');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Este elemento ya está en la lista de favoritos.'),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            }
+                          },
+                        );
                       },
-                      backgroundColor: Colors.yellow,
+                      backgroundColor: Colors.green,
                       foregroundColor: Colors.black,
                       icon: Icons.save,
                       label: 'Añadir a Favoritos',
@@ -180,8 +187,8 @@ class TvShowState extends State<TvShow> {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: Text("Mensaje"),
-                          content: Text("desplegar pantalla de detalles"),
+                          title: Text("Resumen"),
+                          content: Text(shows[index].synopsis),
                           actions: <Widget>[
                             TextButton(
                               child: Text("Cerrar"),
@@ -209,81 +216,8 @@ class TvShowState extends State<TvShow> {
       ),
     );
   }
-
-  // void deleteTVshow(BuildContext context, TVshow) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text("Eliminar Show"),
-  //         content:
-  //             Text('${"¿Esta seguro de querer eliminar a " + TVshow.name}?'),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               Navigator.pop(context);
-  //             },
-  //             child: Text(
-  //               'Cancelar',
-  //             ),
-  //           ),
-  //           TextButton(
-  //             onPressed: () {
-  //               if (mounted) {
-  //                 setState(() {
-  //                   TVShows.remove(TVshow);
-  //                 });
-  //               }
-  //               Navigator.pop(context);
-  //             },
-  //             child: Text(
-  //               'Borrar',
-  //               style: TextStyle(color: Colors.red),
-  //             ),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
-  // List<Widget> _listGifs(data) {
-  //   List<Widget> gifs = [];
-  //
-  //   for (var gif in data) {
-  //     gifs.add(Card(
-  //         child: Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child: Column(
-  //         children: [
-  //           Expanded(
-  //               child: Image.network(
-  //             gif.url,
-  //             fit: BoxFit.fill,
-  //           )),
-  //         ],
-  //       ),
-  //     )));
-  //   }
-  //   return gifs;
-  // }
 }
 
-// class Show {
-//   late String name;
-//   late String imdb;
-//   late double rating;
-//   late String image;
-//   late String synopsis;
-//
-//   show(name, imdb, rating, ImageLink) {
-//     this.name = name;
-//     this.imdb = imdb;
-//     this.rating = rating;
-//     this.image = ImageLink;
-//     this.synopsis;
-//   }
-// }
 class Show {
   final String name;
   final String image;
