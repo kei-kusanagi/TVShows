@@ -146,6 +146,8 @@ class TvShowState extends State<TvShow> {
           return ListView.builder(
             itemCount: shows.length,
             itemBuilder: (context, index) {
+              var labelColor = Colors.green;
+              var labelText = 'Añadir a Favoritos';
               return Slidable(
                 key: Key(shows[index].toString()),
                 endActionPane: ActionPane(
@@ -155,11 +157,11 @@ class TvShowState extends State<TvShow> {
                       onPressed: (BuildContext context) {
                         setState(
                           () {
-                            var check = shows[index].imdb;
-                            if (!favorites.contains(check)) {
-                              print('se agrego');
-                              print(check);
-                              favorites.forEach((show) => print(show.imdb));
+                            // var check = shows[index].imdb;
+                            if (!favorites.contains(shows[index])) {
+                              print(shows[index]);
+                              // print(check);
+                              // favorites.forEach((show) => print(show.imdb));
                               favorites.add(shows[index]);
                             } else {
                               print('NO se agrego');
@@ -174,10 +176,12 @@ class TvShowState extends State<TvShow> {
                           },
                         );
                       },
-                      backgroundColor: Colors.green,
+                      // backgroundColor: Colors.green,
+                      backgroundColor: labelColor,
                       foregroundColor: Colors.black,
                       icon: Icons.save,
-                      label: 'Añadir a Favoritos',
+                      // label: 'Añadir a Favoritos',
+                      label: labelText,
                     ),
                   ],
                 ),
@@ -231,6 +235,10 @@ class Show {
       required this.rating,
       required this.synopsis,
       required this.imdb});
+  @override
+  String toString() {
+    return 'Show{name: $name, image: $image, rating: $rating, synopsis: $synopsis, imdb: $imdb}';
+  }
 }
 
 void doNothing(context) {}
