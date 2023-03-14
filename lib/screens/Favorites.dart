@@ -17,7 +17,7 @@ class _FavoritesState extends State<Favorites> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Favoritos ⭐'),
+          title: Center(child: const Text('Favorites')),
           backgroundColor: Colors.purple,
         ),
         bottomNavigationBar: BottomAppBar(
@@ -97,39 +97,33 @@ class _FavoritesState extends State<Favorites> {
               // ),
               child: ListTile(
                 onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text("Mensaje"),
-                        content: Text("desplegar pantalla de detalles"),
-                        actions: <Widget>[
-                          TextButton(
-                            child: Text("Cerrar"),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
-                    },
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      fullscreenDialog: true,
+                      builder: (BuildContext context) {
+                        return FullScreenDialog(favorites[index].synopsis);
+                      },
+                    ),
                   );
                 },
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(favorites[index].image),
+                leading: Image(
+                  image: NetworkImage(favorites[index].image),
                 ),
                 title: Text(favorites[index].name),
-                subtitle: Text(favorites[index].imdb),
-                trailing:
-                    // const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey),
-                    Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.star, color: Colors.yellow),
-                    const SizedBox(width: 5),
-                    Text(favorites[index].rating.toString()),
-                  ],
-                ),
+                // subtitle: Text(favorites[index].imdb),
+                trailing: const Icon(Icons.arrow_forward_ios_rounded,
+                    color: Colors.grey),
+                // trailing:
+                //     // const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey),
+                //     Row(
+                //   mainAxisSize: MainAxisSize.min,
+                //   children: [
+                //     const Icon(Icons.star, color: Colors.yellow),
+                //     const SizedBox(width: 5),
+                //     Text(favorites[index].rating.toString()),
+                //   ],
+                // ),
               ),
             );
           },
@@ -143,16 +137,17 @@ class _FavoritesState extends State<Favorites> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Eliminar Show"),
-          content:
-              Text("¿Esta seguro de querer eliminar a " + TVshow.name + '?'),
+          title: Text("Remove to Favorites"),
+          content: Text("Are you sure you want to remove " +
+              TVshow.name +
+              ' from favorites?'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
               child: Text(
-                'Cancelar',
+                'Cancel',
               ),
             ),
             TextButton(
@@ -165,7 +160,7 @@ class _FavoritesState extends State<Favorites> {
                 Navigator.pop(context);
               },
               child: Text(
-                'Borrar',
+                'Remove',
                 style: TextStyle(color: Colors.red),
               ),
             ),

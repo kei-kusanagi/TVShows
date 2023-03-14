@@ -76,7 +76,7 @@ class TvShowState extends State<TvShow> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text("Tv Show's 🖥"),
+          title: Center(child: const Text("TV Shows")),
           backgroundColor: Colors.purple,
         ),
         bottomNavigationBar: BottomAppBar(
@@ -101,7 +101,7 @@ class TvShowState extends State<TvShow> {
                         width: 10,
                         height: 50,
                       ),
-                      Text("TV Show's"),
+                      Text("TV Shows"),
                     ],
                   ),
                 ),
@@ -124,7 +124,7 @@ class TvShowState extends State<TvShow> {
                         width: 10,
                         height: 50,
                       ),
-                      Text("Favoritos"),
+                      Text("Favorites"),
                     ],
                   ),
                 ),
@@ -147,7 +147,7 @@ class TvShowState extends State<TvShow> {
             itemCount: shows.length,
             itemBuilder: (context, index) {
               var labelColor = Colors.green;
-              var labelText = 'Añadir a Favoritos';
+              var labelText = 'Add to Favorites';
               return Slidable(
                 key: Key(shows[index].toString()),
                 endActionPane: ActionPane(
@@ -164,11 +164,10 @@ class TvShowState extends State<TvShow> {
                               // favorites.forEach((show) => print(show.imdb));
                               favorites.add(shows[index]);
                             } else {
-                              print('NO se agrego');
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                      'Este elemento ya está en la lista de favoritos.'),
+                                      'This item is already in your favorites list.'),
                                   duration: Duration(seconds: 2),
                                 ),
                               );
@@ -187,29 +186,21 @@ class TvShowState extends State<TvShow> {
                 ),
                 child: ListTile(
                   onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text("Resumen"),
-                          content: Text(shows[index].synopsis),
-                          actions: <Widget>[
-                            TextButton(
-                              child: Text("Cerrar"),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        fullscreenDialog: true,
+                        builder: (BuildContext context) {
+                          return FullScreenDialog(shows[index].synopsis);
+                        },
+                      ),
                     );
                   },
                   leading: Image(
                     image: NetworkImage(shows[index].image),
                   ),
                   title: Text(shows[index].name),
-                  subtitle: Text(shows[index].imdb),
+                  // subtitle: Text(shows[index].imdb),
                   trailing: const Icon(Icons.arrow_forward_ios_rounded,
                       color: Colors.grey),
                 ),
@@ -217,6 +208,28 @@ class TvShowState extends State<TvShow> {
             },
           );
         }),
+      ),
+    );
+  }
+}
+
+class FullScreenDialog extends StatelessWidget {
+  final String synopsis;
+
+  FullScreenDialog(this.synopsis);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Resumen"),
+        leading: IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Center(
+        child: Text(synopsis),
       ),
     );
   }
