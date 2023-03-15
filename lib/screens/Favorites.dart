@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import '../api/api.dart';
 import 'TvShowScreen.dart';
 
 class Favorites extends StatefulWidget {
@@ -20,50 +21,6 @@ class _FavoritesState extends State<Favorites> {
           title: Center(child: const Text('Favorites')),
           backgroundColor: Colors.purple,
         ),
-        bottomNavigationBar: BottomAppBar(
-          color: Colors.purple,
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: ElevatedButton(
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.purple),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => TvShow()),
-                    );
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const <Widget>[
-                      Icon(Icons.tv),
-                      SizedBox(width: 10),
-                      Text("TV Show's"),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: ElevatedButton(
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.purple),
-                  onPressed: () {
-                    // acción del segundo botón
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const <Widget>[
-                      Icon(Icons.favorite),
-                      SizedBox(width: 10),
-                      Text("Favoritos"),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
         body: ListView.builder(
           itemCount: favorites.length,
           itemBuilder: (context, index) {
@@ -83,18 +40,6 @@ class _FavoritesState extends State<Favorites> {
                   ),
                 ],
               ),
-              // endActionPane: const ActionPane(
-              //   motion: ScrollMotion(),
-              //   children: [
-              //     SlidableAction(
-              //       onPressed: doNothing,
-              //       backgroundColor: Colors.yellow,
-              //       foregroundColor: Colors.black,
-              //       icon: Icons.save,
-              //       label: 'Añadir a Favoritos',
-              //     ),
-              //   ],
-              // ),
               child: ListTile(
                 onTap: () {
                   Navigator.push(
@@ -102,13 +47,15 @@ class _FavoritesState extends State<Favorites> {
                     MaterialPageRoute(
                       fullscreenDialog: true,
                       builder: (BuildContext context) {
-                        return FullScreenDialog(favorites[index].synopsis);
+                        return FullScreenDialog('favorites[index].synopsis');
+                        // return FullScreenDialog(favorites[index].synopsis);
                       },
                     ),
                   );
                 },
                 leading: Image(
-                  image: NetworkImage(favorites[index].image),
+                  image: NetworkImage('favorites[index].image'),
+                  // image: NetworkImage(favorites[index].image),
                 ),
                 title: Text(favorites[index].name),
                 // subtitle: Text(favorites[index].imdb),

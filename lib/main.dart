@@ -6,9 +6,14 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
 
-  // This widget is the root of your application.
+class _MyAppState extends State<MyApp> {
+  int _selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,11 +23,27 @@ class MyApp extends StatelessWidget {
         body: PageView(
           physics: BouncingScrollPhysics(),
           children: <Widget>[
-            TvShow(),
-            Favorites(),
-          ]
-        )
-      )
+            _selectedIndex == 0 ? TvShow() : Favorites(),
+          ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.live_tv_outlined),
+              label: 'TV Shows',
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.favorite), label: 'Favorites')
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.purple[800],
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+        ),
+      ),
     );
   }
 }
