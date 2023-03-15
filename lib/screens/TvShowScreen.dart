@@ -1,6 +1,7 @@
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:tv_show/api/api.dart';
+import 'package:tv_show/screens/Favorites.dart';
 
 class TvShow extends StatefulWidget {
   @override
@@ -8,9 +9,6 @@ class TvShow extends StatefulWidget {
 }
 
 class TvShowState extends State<TvShow> {
-  String urlString =
-      "https://api.giphy.com/v1/gifs/trending?api_key=GbT1BcYH7nEBK6r9bcmLwWIXLQKB1kTc&limit=10&rating=g";
-
   // List<Show> shows = [
   //   Show(
   //       name: 'The Last of Us',
@@ -57,116 +55,126 @@ class TvShowState extends State<TvShow> {
           title: Center(child: const Text("TV Shows")),
           backgroundColor: Colors.purple,
         ),
-        // body: FutureBuilder(
-        //     future: fetchShows(),
-        //     builder: (context, snapshot) {
-        //       if (snapshot.hasData) {
-        //         return GridView.count(
-        //           crossAxisCount: 2,
-        //         );
-        //       } else if (snapshot.hasError) {
-        //         print(snapshot.error);
-        //         return Text("Error");
-        //       }
-        //       return ListView.builder(
-        //         itemCount: shows.length,
-        //         itemBuilder: (context, index) {
-        //           var labelColor = Colors.green;
-        //           var labelText = 'Add to Favorites';
-        //           return Slidable(
-        //             key: Key(shows[index].toString()),
-        //             endActionPane: ActionPane(
-        //               motion: ScrollMotion(),
-        //               children: [
-        //                 SlidableAction(
-        //                   onPressed: (BuildContext context) {
-        //                     setState(
-        //                       () {
-        //                         // var check = shows[index].imdb;
-        //                         if (!favorites.contains(shows[index])) {
-        //                           print(shows[index]);
-        //                           // print(check);
-        //                           // favorites.forEach((show) => print(show.imdb));
-        //                           favorites.add(shows[index]);
-        //                         } else {
-        //                           ScaffoldMessenger.of(context).showSnackBar(
-        //                             SnackBar(
-        //                               content: Text(
-        //                                   'This item is already in your favorites list.'),
-        //                               duration: Duration(seconds: 2),
-        //                             ),
-        //                           );
-        //                         }
-        //                       },
-        //                     );
-        //                   },
-        //                   // backgroundColor: Colors.green,
-        //                   backgroundColor: labelColor,
-        //                   foregroundColor: Colors.black,
-        //                   icon: Icons.save,
-        //                   // label: 'Añadir a Favoritos',
-        //                   label: labelText,
-        //                 ),
-        //               ],
-        //             ),
-        //             child: ListTile(
-        //               onTap: () {
-        //                 Navigator.push(
-        //                   context,
-        //                   MaterialPageRoute(
-        //                     fullscreenDialog: true,
-        //                     builder: (BuildContext context) {
-        //                       return FullScreenDialog(shows[index].synopsis);
-        //                     },
-        //                   ),
-        //                 );
-        //               },
-        //               leading: Image(
-        //                 image: NetworkImage(snapshot.data![index].imageMedium),
+        body: FutureBuilder<List<Show>>(
+          future: fetchShows(),
+          builder: (context, listdata) {
+            if (listdata.hasData) {
+              return ListView.builder(
+                itemCount: listdata.data!.length,
+                itemBuilder: (context, index) {
+                  var labelColor = Colors.green;
+                  var labelText = 'Add to Favorites';
+                  return Slidable(
+                    key: Key(listdata.data![index].toString()),
+                    endActionPane: ActionPane(
+                      motion: ScrollMotion(),
+                      children: [
+                        SlidableAction(
+                          onPressed: (BuildContext context) {
+                            setState(
+                              () {
+                                if (!favorites
+                                    .contains(listdata.data![index])) {
+                                  favorites.add(listdata.data![index]);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          'This item is already in your favorites list.'),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
+                              },
+                            );
+                          },
+                          // backgroundColor: Colors.green,
+                          backgroundColor: labelColor,
+                          foregroundColor: Colors.black,
+                          icon: Icons.save,
+                          // label: 'Añadir a Favoritos',
+                          label: labelText,
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListTile(
+                        title: Text(listdata.data![index].name),
+                        leading:
+                            Image.network(listdata.data![index].imageMedium),
+                      ),
+                    ),
+                  );
+                },
+              );
+            } else if (listdata.hasError) {
+              return Text("${listdata.error}");
+            }
+            return const Center(child: CircularProgressIndicator());
+          },
+        ),
+
+        //         child: ListTile(
+        //           onTap: () {
+        //             Navigator.push(
+        //               context,
+        //               MaterialPageRoute(
+        //                 fullscreenDialog: true,
+        //                 builder: (BuildContext context) {
+        //                   return FullScreenDialog(shows[index].synopsis);
+        //                 },
         //               ),
-        //               title: Text(snapshot.data![index].name),
-        //               trailing: const Icon(Icons.arrow_forward_ios_rounded,
-        //                   color: Colors.grey),
+        //             );
+        //           },
+        //           leading: Image(
+        //             image: NetworkImage(snapshot.data![index].imageMedium),
+        //           ),
+        //           title: Text(snapshot.data![index].name),
+        //           trailing: const Icon(Icons.arrow_forward_ios_rounded,
+        //               color: Colors.grey),
+        //         ),
+        //       );
+        //     },
+        //   );
+        // }),
+        // body: FutureBuilder<List<Show>>(
+        //   future: fetchShows(),
+        //   builder: (context, listdata) {
+        //     if (listdata.hasData) {
+        //       return ListView.builder(
+        //         itemCount: listdata.data!.length,
+        //         itemBuilder: (context, index) {
+        //           return Padding(
+        //             padding: const EdgeInsets.all(8.0),
+        //             child: ListTile(
+        //               title: Text(listdata.data![index].name),
+        //               leading: Image.network(listdata.data![index].imageMedium),
         //             ),
         //           );
         //         },
         //       );
-        //     }),
-        body: Center(
-          child: FutureBuilder<List<Show>>(
-            future: fetchShows(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        title: Text(snapshot.data![index].name),
-                        leading:
-                            Image.network(snapshot.data![index].imageMedium),
-                      ),
-                    );
-                  },
-                );
-              } else if (snapshot.hasError) {
-                return Text("${snapshot.error}");
-              }
-              return CircularProgressIndicator();
-            },
-          ),
-        ),
+        //     } else if (listdata.hasError) {
+        //       return Text("${listdata.error}");
+        //     }
+        //     return const Center(child: CircularProgressIndicator());
+        //   },
+        // ),
       ),
     );
   }
 }
 
-class FullScreenDialog extends StatelessWidget {
+class FullScreenDialog extends StatefulWidget {
   final String synopsis;
 
   FullScreenDialog(this.synopsis);
 
+  @override
+  State<FullScreenDialog> createState() => _FullScreenDialogState();
+}
+
+class _FullScreenDialogState extends State<FullScreenDialog> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -178,7 +186,7 @@ class FullScreenDialog extends StatelessWidget {
         ),
       ),
       body: Center(
-        child: Text(synopsis),
+        child: Text(widget.synopsis),
       ),
     );
   }

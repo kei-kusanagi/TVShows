@@ -7,13 +7,18 @@ class Show {
   final String summary;
   final String imageOriginal;
   final String imageMedium;
+  final String imdb;
+  final dynamic rating;
 
-  Show(
-      {required this.id,
-      required this.name,
-      required this.summary,
-      required this.imageOriginal,
-      required this.imageMedium});
+  Show({
+    required this.id,
+    required this.name,
+    required this.summary,
+    required this.imageOriginal,
+    required this.imageMedium,
+    required this.imdb,
+    required this.rating,
+  });
 
   factory Show.fromJson(Map<String, dynamic> json) {
     return Show(
@@ -22,6 +27,8 @@ class Show {
       summary: json['summary'],
       imageOriginal: json['image']['original'],
       imageMedium: json['image']['medium'],
+      imdb: json['externals'] != null ? json['externals']['imdb'] ?? '' : '',
+      rating: json['rating'] != null ? json['rating']['average'] ?? 0.0 : 0.0,
     );
   }
 }

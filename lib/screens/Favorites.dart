@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../api/api.dart';
-import 'TvShowScreen.dart';
 
 class Favorites extends StatefulWidget {
   const Favorites({Key? key}) : super(key: key);
@@ -47,15 +46,48 @@ class _FavoritesState extends State<Favorites> {
                     MaterialPageRoute(
                       fullscreenDialog: true,
                       builder: (BuildContext context) {
-                        return FullScreenDialog('favorites[index].synopsis');
-                        // return FullScreenDialog(favorites[index].synopsis);
+                        return Scaffold(
+                          appBar: AppBar(
+                            backgroundColor: Colors.orangeAccent,
+                            title: Text(favorites[index].name),
+                          ),
+                          body: Column(
+                            children: <Widget>[
+                              Hero(
+                                tag: '',
+                                child: Image(
+                                  image: NetworkImage(
+                                      favorites[index].imageMedium),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text('tt1553656'),
+                                    ],
+                                  ),
+                                  Spacer(),
+                                  Icon(Icons.star, color: Colors.yellow),
+                                  Text('9.5'),
+                                ],
+                              ),
+                              Text(
+                                favorites[index].summary,
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                            ],
+                          ),
+                        );
                       },
                     ),
                   );
                 },
+
                 leading: Image(
-                  image: NetworkImage('favorites[index].image'),
-                  // image: NetworkImage(favorites[index].image),
+                  image: NetworkImage(favorites[index].imageMedium),
                 ),
                 title: Text(favorites[index].name),
                 // subtitle: Text(favorites[index].imdb),
