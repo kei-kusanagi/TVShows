@@ -100,9 +100,15 @@ class TvShowState extends State<TvShow> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ListTile(
+                        onTap: () {
+                          NavigationHelper()
+                              .detailPush(context, listdata, index);
+                        },
                         title: Text(listdata.data![index].name),
                         leading:
                             Image.network(listdata.data![index].imageMedium),
+                        trailing: const Icon(Icons.arrow_forward_ios_rounded,
+                            color: Colors.grey),
                       ),
                     ),
                   );
@@ -114,79 +120,55 @@ class TvShowState extends State<TvShow> {
             return const Center(child: CircularProgressIndicator());
           },
         ),
-
-        //         child: ListTile(
-        //           onTap: () {
-        //             Navigator.push(
-        //               context,
-        //               MaterialPageRoute(
-        //                 fullscreenDialog: true,
-        //                 builder: (BuildContext context) {
-        //                   return FullScreenDialog(shows[index].synopsis);
-        //                 },
-        //               ),
-        //             );
-        //           },
-        //           leading: Image(
-        //             image: NetworkImage(snapshot.data![index].imageMedium),
-        //           ),
-        //           title: Text(snapshot.data![index].name),
-        //           trailing: const Icon(Icons.arrow_forward_ios_rounded,
-        //               color: Colors.grey),
-        //         ),
-        //       );
-        //     },
-        //   );
-        // }),
-        // body: FutureBuilder<List<Show>>(
-        //   future: fetchShows(),
-        //   builder: (context, listdata) {
-        //     if (listdata.hasData) {
-        //       return ListView.builder(
-        //         itemCount: listdata.data!.length,
-        //         itemBuilder: (context, index) {
-        //           return Padding(
-        //             padding: const EdgeInsets.all(8.0),
-        //             child: ListTile(
-        //               title: Text(listdata.data![index].name),
-        //               leading: Image.network(listdata.data![index].imageMedium),
-        //             ),
-        //           );
-        //         },
-        //       );
-        //     } else if (listdata.hasError) {
-        //       return Text("${listdata.error}");
-        //     }
-        //     return const Center(child: CircularProgressIndicator());
-        //   },
-        // ),
       ),
     );
   }
 }
 
-class FullScreenDialog extends StatefulWidget {
-  final String synopsis;
-
-  FullScreenDialog(this.synopsis);
-
-  @override
-  State<FullScreenDialog> createState() => _FullScreenDialogState();
-}
-
-class _FullScreenDialogState extends State<FullScreenDialog> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Resumen"),
-        leading: IconButton(
-          icon: Icon(Icons.close),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Center(
-        child: Text(widget.synopsis),
+class NavigationHelper {
+  Future<dynamic> detailPush(
+      BuildContext context, AsyncSnapshot<List<Show>> listdata, int index) {
+    return Navigator.push(
+      context,
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (BuildContext context) {
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.orangeAccent,
+              title: Text(listdata.data![index].name),
+            ),
+            body: Center(
+              child: Column(
+                children: <Widget>[
+                  Hero(
+                    tag: '',
+                    child: Image(
+                      image: NetworkImage(listdata.data![index].imageMedium),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('IMDb: ${listdata.data![index].imdb}'),
+                        ],
+                      ),
+                      Spacer(),
+                      // Icon(Icons.star, color: Colors.yellow),
+                      Text('Rating: ${listdata.data![index].rating}'),
+                    ],
+                  ),
+                  Text(
+                    listdata.data![index].summary,
+                    style: const TextStyle(fontSize: 20.0),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
