@@ -7,15 +7,16 @@ class Favorites extends StatefulWidget {
   const Favorites({Key? key}) : super(key: key);
 
   @override
-  State<Favorites> createState() => _FavoritesState();
+  State<Favorites> createState() => FavoritesState();
 }
 
 List<Show> favorites = [];
 
-class _FavoritesState extends State<Favorites> {
+class FavoritesState extends State<Favorites> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: Center(child: const Text('Favorites')),
@@ -46,7 +47,9 @@ class _FavoritesState extends State<Favorites> {
                       context,
                       AsyncSnapshot<List<Show>>.withData(
                           ConnectionState.none, favorites),
-                      index);
+                      index,
+                      'Favorites',
+                      favorites);
                 },
                 leading: Image(
                   image: NetworkImage(favorites[index].imageMedium),
@@ -63,7 +66,7 @@ class _FavoritesState extends State<Favorites> {
     );
   }
 
-  void deleteTVshow(BuildContext context, TVshow) {
+  deleteTVshow(BuildContext context, TVshow) {
     showDialog(
       context: context,
       builder: (BuildContext context) {

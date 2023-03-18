@@ -2,6 +2,8 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:tv_show/api/api.dart';
 import 'package:tv_show/screens/Favorites.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TvShow extends StatefulWidget {
   @override
@@ -50,6 +52,7 @@ class TvShowState extends State<TvShow> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: Center(child: const Text("TV Shows")),
@@ -101,8 +104,8 @@ class TvShowState extends State<TvShow> {
                       padding: const EdgeInsets.all(8.0),
                       child: ListTile(
                         onTap: () {
-                          NavigationHelper()
-                              .detailPush(context, listdata, index);
+                          NavigationHelper().detailPush(
+                              context, listdata, index, 'TV Shows', favorites);
                         },
                         title: Text(listdata.data![index].name),
                         leading:
@@ -127,44 +130,110 @@ class TvShowState extends State<TvShow> {
 
 class NavigationHelper {
   Future<dynamic> detailPush(
-      BuildContext context, AsyncSnapshot<List<Show>> listdata, int index) {
+      BuildContext context,
+      AsyncSnapshot<List<Show>> listdata,
+      int index,
+      String previousPageName,
+      List<Show> favorites) {
     return Navigator.push(
       context,
       MaterialPageRoute(
-        fullscreenDialog: true,
         builder: (BuildContext context) {
           return Scaffold(
             appBar: AppBar(
+              actions: [
+                IconButton(
+                    onPressed: () {
+                      if (!favorites.contains(listdata.data![index])) {
+                        favorites.add(listdata.data![index]);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Added to favorites'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'This item is already in your favorites list.'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    },
+                    icon: Icon(Icons.favorite))
+              ],
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
               backgroundColor: Colors.orangeAccent,
-              title: Text(listdata.data![index].name),
-            ),
-            body: Center(
-              child: Column(
-                children: <Widget>[
-                  Hero(
-                    tag: '',
-                    child: Image(
-                      image: NetworkImage(listdata.data![index].imageMedium),
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('IMDb: ${listdata.data![index].imdb}'),
-                        ],
-                      ),
-                      Spacer(),
-                      // Icon(Icons.star, color: Colors.yellow),
-                      Text('Rating: ${listdata.data![index].rating}'),
-                    ],
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    previousPageName,
+                    style: TextStyle(fontSize: 16),
                   ),
                   Text(
-                    listdata.data![index].summary,
-                    style: const TextStyle(fontSize: 20.0),
+                    listdata.data![index].name,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ],
+              ),
+            ),
+            body: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    Hero(
+                      tag: listdata
+                          .data![index].id, // Utiliza un identificador único
+                      child: Image(
+                        image: NetworkImage(listdata.data![index].imageMedium),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              InkWell(
+                                child: Text(
+                                  'IMDb: ${listdata.data![index].imdb}',
+                                  style: const TextStyle(
+                                    decoration: TextDecoration.underline,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                                onTap: () {
+                                  launch(Uri.parse(
+                                          'https://www.imdb.com/title/${listdata.data![index].imdb}')
+                                      .toString());
+                                },
+                              ),
+                            ],
+                          ),
+                          Spacer(),
+                          // Icon(Icons.star, color: Colors.yellow),
+                          Text('Rating: ${listdata.data![index].rating}'),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: HtmlWidget(
+                        listdata.data![index].summary,
+                        // style: const TextStyle(fontSize: 20.0),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
