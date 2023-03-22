@@ -47,7 +47,42 @@ class SQLHelper {
     };
     final id = await db.insert('items', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
-
     return id;
+  }
+
+  static Future<List<Map<String, dynamic>>> getItems() async {
+    final db = await SQLHelper.db();
+    return db.query('items', orderBy: 'id');
+  }
+
+  static Future<List<Map<String, dynamic>>> getItem(int id) async {
+    final db = await SQLHelper.db();
+    return db.query('items', orderBy: 'id = ?', whereArgs: [id], limit: 1);
+  }
+
+  static Future<int> updateItem(
+      int id,
+      String api_id,
+      String name,
+      String summary,
+      String image_original,
+      String image_medium,
+      String imdb,
+      double rating) async {
+    final db = await SQLHelper.db();
+
+    final data = {
+      'api_id': api_id,
+      'name': name,
+      'summary': summary,
+      'image_original': image_original,
+      'image_medium': image_medium,
+      'imdb': imdb,
+      'rating': rating
+    };
+
+    final result =
+        await db.update('items', data, where: 'id = ?', whereArgs: [id]);
+    return result;
   }
 }
