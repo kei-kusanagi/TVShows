@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../api/api.dart';
 import 'package:tv_show/screens/TvShowScreen.dart';
-
 import '../sql/sql_helper.dart';
 
 class Favorites extends StatefulWidget {
@@ -11,8 +10,6 @@ class Favorites extends StatefulWidget {
   @override
   State<Favorites> createState() => FavoritesState();
 }
-
-List<Show> favorites = [];
 
 class FavoritesState extends State<Favorites> {
   List<Map<String, dynamic>> _favorites = [];
@@ -29,26 +26,30 @@ class FavoritesState extends State<Favorites> {
 
   @override
   Widget build(BuildContext context) {
+    _refreshFavorites();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          title: Center(child: const Text('Favorites')),
+          title: const Center(child: Text('Favorites')),
           backgroundColor: Colors.purple,
         ),
         body: ListView.builder(
-          itemCount: favorites.length,
+          itemCount: _favorites.length,
           itemBuilder: (context, index) {
             return Slidable(
-              key: Key(favorites[index].toString()),
+              key: Key(_favorites[index].toString()),
               endActionPane: ActionPane(
-                motion: ScrollMotion(),
+                motion: const ScrollMotion(),
                 children: [
                   SlidableAction(
+                    // onPressed: (BuildContext context) {
+                    //   SQLHelper.deleteItem(_favorites[index]['id']);
+                    // },
                     onPressed: (BuildContext context) {
-                      deleteTVshow(context, favorites[index]);
+                      deleteTVshow(context, _favorites[index]);
                     },
-                    backgroundColor: Color(0xFFFE4A49),
+                    backgroundColor: const Color(0xFFFE4A49),
                     foregroundColor: Colors.white,
                     icon: Icons.delete,
                     label: 'Delete',
@@ -59,16 +60,15 @@ class FavoritesState extends State<Favorites> {
                 onTap: () {
                   NavigationHelper().detailPush(
                       context,
-                      AsyncSnapshot<List<Show>>.withData(
-                          ConnectionState.none, favorites),
+                      AsyncSnapshot<List<Show>>.withData(ConnectionState.none,
+                          _favorites[index] as List<Show>),
                       index,
-                      'Favorites',
-                      favorites);
+                      _favorites[index] as String);
                 },
                 leading: Image(
-                  image: NetworkImage(favorites[index].imageMedium),
+                  image: NetworkImage(_favorites[index]['imageMedium']),
                 ),
-                title: Text(favorites[index].name),
+                title: Text(_favorites[index]['name']),
                 // subtitle: Text(favorites[index].imdb),
                 trailing: const Icon(Icons.arrow_forward_ios_rounded,
                     color: Colors.grey),
@@ -80,20 +80,20 @@ class FavoritesState extends State<Favorites> {
     );
   }
 
-  deleteTVshow(BuildContext context, TVshow) {
+  deleteTVshow(BuildContext context, _favorites) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Remove to Favorites"),
+          title: const Text("Remove to Favorites"),
           content: Text(
-              '${"Are you sure you want to remove " + TVshow.name} from favorites?'),
+              '${"Are you sure you want to remove " + _favorites['name']} from favorites?'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text(
+              child: const Text(
                 'Cancel',
               ),
             ),
@@ -101,12 +101,12 @@ class FavoritesState extends State<Favorites> {
               onPressed: () {
                 if (mounted) {
                   setState(() {
-                    favorites.remove(TVshow);
+                    SQLHelper.deleteItem(_favorites['id'] as int);
                   });
                 }
                 Navigator.pop(context);
               },
-              child: Text(
+              child: const Text(
                 'Remove',
                 style: TextStyle(color: Colors.red),
               ),
