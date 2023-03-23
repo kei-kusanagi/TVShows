@@ -3,6 +3,8 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import '../api/api.dart';
 import 'package:tv_show/screens/TvShowScreen.dart';
 
+import '../sql/sql_helper.dart';
+
 class Favorites extends StatefulWidget {
   const Favorites({Key? key}) : super(key: key);
 
@@ -13,6 +15,18 @@ class Favorites extends StatefulWidget {
 List<Show> favorites = [];
 
 class FavoritesState extends State<Favorites> {
+  List<Map<String, dynamic>> _favorites = [];
+
+  bool _isLoading = true;
+
+  void _refreshFavorites() async {
+    final data = await SQLHelper.getItems();
+    setState(() {
+      _favorites = data;
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

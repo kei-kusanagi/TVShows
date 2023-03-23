@@ -85,4 +85,13 @@ class SQLHelper {
         await db.update('items', data, where: 'id = ?', whereArgs: [id]);
     return result;
   }
+
+  static Future<void> deleteItem(int id) async {
+    final db = await SQLHelper.db();
+    try {
+      await db.delete('items', where: 'id = ?', whereArgs: [id]);
+    } catch (err) {
+      debugPrint('Something went wrong when deleting an item: $err');
+    }
+  }
 }

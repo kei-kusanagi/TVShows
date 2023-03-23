@@ -81,7 +81,7 @@ class TvShowState extends State<TvShow> {
                                   favorites.add(listdata.data![index]);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
+                                    const SnackBar(
                                       content: Text(
                                           'This item is already in your favorites list.'),
                                       duration: Duration(seconds: 2),
@@ -147,14 +147,14 @@ class NavigationHelper {
                       if (!favorites.contains(listdata.data![index])) {
                         favorites.add(listdata.data![index]);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('Added to favorites'),
                             duration: Duration(seconds: 2),
                           ),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text(
                                 'This item is already in your favorites list.'),
                             duration: Duration(seconds: 2),
