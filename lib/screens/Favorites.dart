@@ -61,9 +61,15 @@ class FavoritesState extends State<Favorites> {
                   NavigationHelper().detailPush(
                       context,
                       AsyncSnapshot<List<Show>>.withData(ConnectionState.none,
-                          _favorites[index] as List<Show>),
+                          _favorites[index]['id'] as List<Show>),
                       index,
-                      _favorites[index] as String);
+                      'TV Shows');
+                  // NavigationHelper().detailPush(
+                  //     context,
+                  //     AsyncSnapshot<List<Show>>.withData(
+                  //         ConnectionState.none, _favorites as List<Show>),
+                  //     index,
+                  //     'Favorites');
                 },
                 leading: Image(
                   image: NetworkImage(_favorites[index]['imageMedium']),

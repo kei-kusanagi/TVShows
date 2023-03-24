@@ -1,9 +1,6 @@
-import 'dart:ffi';
-
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:tv_show/api/api.dart';
-import 'package:tv_show/screens/Favorites.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:tv_show/sql/sql_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -125,26 +122,12 @@ class TvShowState extends State<TvShow> {
                                     listdata.data![index].imageMedium as String,
                                     listdata.data![index].imdb as String,
                                     listdata.data![index].rating as double);
-                                // if (!favorites
-                                //     .contains(listdata.data![index])) {
-                                //   favorites.add(listdata.data![index]);
-                                // } else {
-                                //   ScaffoldMessenger.of(context).showSnackBar(
-                                //     const SnackBar(
-                                //       content: Text(
-                                //           'This item is already in your favorites list.'),
-                                //       duration: Duration(seconds: 2),
-                                //     ),
-                                //   );
-                                // }
                               },
                             );
                           },
-                          // backgroundColor: Colors.green,
                           backgroundColor: labelColor,
                           foregroundColor: Colors.black,
                           icon: Icons.save,
-                          // label: 'Añadir a Favoritos',
                           label: labelText,
                         ),
                       ],
@@ -193,6 +176,15 @@ class NavigationHelper {
               actions: [
                 IconButton(
                     onPressed: () {
+                      SQLHelper.createItem(
+                          listdata.data![index].id as int,
+                          listdata.data![index].name as String,
+                          listdata.data![index].summary as String,
+                          listdata.data![index].imageOriginal as String,
+                          listdata.data![index].imageMedium as String,
+                          listdata.data![index].imdb as String,
+                          listdata.data![index].rating as double);
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Added to favorites'),
