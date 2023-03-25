@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import '../api/api.dart';
 import 'package:tv_show/screens/TvShowScreen.dart';
 import '../sql/sql_helper.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Favorites extends StatefulWidget {
   const Favorites({Key? key}) : super(key: key);
@@ -15,6 +17,8 @@ class FavoritesState extends State<Favorites> {
   List<Map<String, dynamic>> _favorites = [];
 
   bool _isLoading = true;
+
+  late bool slidable;
 
   void _refreshFavorites() async {
     final data = await SQLHelper.getItems();
@@ -43,11 +47,9 @@ class FavoritesState extends State<Favorites> {
                 motion: const ScrollMotion(),
                 children: [
                   SlidableAction(
-                    // onPressed: (BuildContext context) {
-                    //   SQLHelper.deleteItem(_favorites[index]['id']);
-                    // },
                     onPressed: (BuildContext context) {
-                      deleteTVshow(context, _favorites[index]);
+                      deleteTVshow(context, _favorites[index]['id'],
+                          _favorites[index]['name'], true);
                     },
                     backgroundColor: const Color(0xFFFE4A49),
                     foregroundColor: Colors.white,
@@ -58,18 +60,7 @@ class FavoritesState extends State<Favorites> {
               ),
               child: ListTile(
                 onTap: () {
-                  NavigationHelper().detailPush(
-                      context,
-                      AsyncSnapshot<List<Show>>.withData(ConnectionState.none,
-                          _favorites[index]['id'] as List<Show>),
-                      index,
-                      'TV Shows');
-                  // NavigationHelper().detailPush(
-                  //     context,
-                  //     AsyncSnapshot<List<Show>>.withData(
-                  //         ConnectionState.none, _favorites as List<Show>),
-                  //     index,
-                  //     'Favorites');
+                  _showDetail(_favorites[index]);
                 },
                 leading: Image(
                   image: NetworkImage(_favorites[index]['imageMedium']),
@@ -86,14 +77,15 @@ class FavoritesState extends State<Favorites> {
     );
   }
 
-  deleteTVshow(BuildContext context, _favorites) {
+  late String showName;
+  deleteTVshow(BuildContext context, _favorites, showName, bool slidable) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Remove to Favorites"),
           content: Text(
-              '${"Are you sure you want to remove " + _favorites['name']} from favorites?'),
+              '${"Are you sure you want to remove " + showName} from favorites?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -107,10 +99,15 @@ class FavoritesState extends State<Favorites> {
               onPressed: () {
                 if (mounted) {
                   setState(() {
-                    SQLHelper.deleteItem(_favorites['id'] as int);
+                    SQLHelper.deleteItem(_favorites as int);
                   });
+                  if (slidable == false) {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  } else {
+                    Navigator.pop(context);
+                  }
                 }
-                Navigator.pop(context);
               },
               child: const Text(
                 'Remove',
@@ -121,5 +118,149 @@ class FavoritesState extends State<Favorites> {
         );
       },
     );
+    // Navigator.pop(context);
+  }
+
+  void _showDetail(Map<String, dynamic> showData) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      return Scaffold(
+        appBar: AppBar(
+          actions: [
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                deleteTVshow(context, showData['id'], showData['name'], false);
+              },
+            )
+          ],
+          backgroundColor: Colors.orangeAccent,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Favorites',
+                style: TextStyle(fontSize: 16),
+              ),
+              Text(
+                showData['name'],
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
+        body: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double screenWidth = constraints.maxWidth;
+
+            if (screenWidth > 600) {
+              // Pantalla grande
+              return Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Center(
+                        child: Image(
+                          image: NetworkImage(showData['imageMedium']),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  InkWell(
+                                    child: Text(
+                                      'IMDb: ${showData['imdb']}',
+                                      style: const TextStyle(
+                                        decoration: TextDecoration.underline,
+                                        color: Colors.blue,
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      launch(Uri.parse(
+                                              'https://www.imdb.com/title/${showData['imdb']}')
+                                          .toString());
+                                    },
+                                  ),
+                                ],
+                              ),
+                              Spacer(),
+                              Text('Rating: ${showData['rating']}'),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: HtmlWidget(
+                              showData['summary'],
+                              // style: const TextStyle(fontSize: 20.0),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              // Pantalla pequeña
+              return SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Image(
+                      image: NetworkImage(showData['imageMedium']),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              InkWell(
+                                child: Text(
+                                  'IMDb: ${showData['imdb']}',
+                                  style: const TextStyle(
+                                    decoration: TextDecoration.underline,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                                onTap: () {
+                                  launch(Uri.parse(
+                                          'https://www.imdb.com/title/${showData['imdb']}')
+                                      .toString());
+                                },
+                              ),
+                            ],
+                          ),
+                          Spacer(),
+                          Text('Rating: ${showData['rating']}'),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: HtmlWidget(
+                        showData['summary'],
+                        // style: const TextStyle(fontSize: 20.0),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+          },
+        ),
+      );
+    }));
   }
 }
