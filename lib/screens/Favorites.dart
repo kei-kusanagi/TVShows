@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import '../api/api.dart';
-import 'package:tv_show/screens/TvShowScreen.dart';
 import '../sql/sql_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 

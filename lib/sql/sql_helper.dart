@@ -62,6 +62,13 @@ class SQLHelper {
     return db.query('items', orderBy: 'id = ?', whereArgs: [id], limit: 1);
   }
 
+  static Future<bool> getIMDB(String imdb) async {
+    final db = await SQLHelper.db();
+    final List<Map<String, dynamic>> maps =
+        await db.query('items', where: "imdb = ?", whereArgs: [imdb]);
+    return maps.isNotEmpty;
+  }
+
   static Future<int> updateItem(
       int id,
       String api_id,

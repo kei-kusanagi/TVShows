@@ -2,6 +2,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:tv_show/api/api.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:tv_show/screens/Favorites.dart';
 import 'package:tv_show/sql/sql_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -27,46 +28,23 @@ class TvShowState extends State<TvShow> {
               return ListView.builder(
                 itemCount: listdata.data!.length,
                 itemBuilder: (context, index) {
-                  var labelColor = Colors.green;
-                  var labelText = 'Add to Favorites';
-                  return Slidable(
-                    key: Key(listdata.data![index].toString()),
-                    endActionPane: ActionPane(
-                      motion: ScrollMotion(),
-                      children: [
-                        SlidableAction(
-                          onPressed: (BuildContext context) {
-                            setState(
-                              () {
-                                SQLHelper.createItem(
-                                    listdata.data![index].id as int,
-                                    listdata.data![index].name as String,
-                                    listdata.data![index].summary as String,
-                                    listdata.data![index].imageOriginal
-                                        as String,
-                                    listdata.data![index].imageMedium as String,
-                                    listdata.data![index].imdb as String,
-                                    listdata.data![index].rating as double);
-                              },
-                            );
-                          },
-                          backgroundColor: labelColor,
-                          foregroundColor: Colors.black,
-                          icon: Icons.save,
-                          label: labelText,
-                        ),
-                      ],
-                    ),
-                    child: ListTile(
-                      onTap: () {
-                        NavigationHelper()
-                            .detailPush(context, listdata, index, 'TV Shows');
-                      },
-                      title: Text(listdata.data![index].name),
-                      leading: Image.network(listdata.data![index].imageMedium),
-                      trailing: const Icon(Icons.arrow_forward_ios_rounded,
-                          color: Colors.grey),
-                    ),
+                  Future<bool> isFavorite =
+                      SQLHelper.getIMDB(listdata.data![index].imdb);
+                  return FutureBuilder<bool>(
+                    future: isFavorite,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        bool isFavorite = snapshot.data!;
+                        if (isFavorite) {
+                          return removeFavoritesSlidable(
+                              listdata, index, context);
+                        } else {
+                          return addFavoritesSlidable(listdata, index, context);
+                        }
+                      } else {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                    },
                   );
                 },
               );
@@ -76,6 +54,83 @@ class TvShowState extends State<TvShow> {
             return const Center(child: CircularProgressIndicator());
           },
         ),
+      ),
+    );
+  }
+
+  Slidable removeFavoritesSlidable(
+      AsyncSnapshot<List<Show>> listdata, int index, BuildContext context) {
+    return Slidable(
+      key: Key(listdata.data![index].toString()),
+      endActionPane: ActionPane(
+        motion: ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (BuildContext context) {
+              setState(
+                () {
+                  SQLHelper.deleteItem(listdata.data![index].id as int);
+                  // FavoritesState.deleteTVshow(context, listdata.data![index].id,
+                  //     listdata.data![index].name, true);
+                },
+              );
+            },
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.black,
+            icon: Icons.delete,
+            label: 'Remove to Favorites',
+          ),
+        ],
+      ),
+      child: ListTile(
+        onTap: () {
+          NavigationHelper().detailPush(context, listdata, index, 'TV Shows');
+        },
+        title: Text(listdata.data![index].name),
+        leading: Image.network(listdata.data![index].imageMedium),
+        trailing:
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey),
+      ),
+    );
+  }
+
+  Slidable addFavoritesSlidable(
+      AsyncSnapshot<List<Show>> listdata, int index, BuildContext context) {
+    return Slidable(
+      key: Key(listdata.data![index].toString()),
+      endActionPane: ActionPane(
+        motion: ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (BuildContext context) {
+              setState(
+                () {
+                  SQLHelper.createItem(
+                      listdata.data![index].id as int,
+                      listdata.data![index].name as String,
+                      listdata.data![index].summary as String,
+                      listdata.data![index].imageOriginal as String,
+                      listdata.data![index].imageMedium as String,
+                      listdata.data![index].imdb as String,
+                      listdata.data![index].rating as double);
+                },
+              );
+            },
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.black,
+            icon: Icons.save,
+            label: 'Add to Favorites',
+          ),
+        ],
+      ),
+      child: ListTile(
+        onTap: () {
+          NavigationHelper().detailPush(context, listdata, index, 'TV Shows');
+        },
+        title: Text(listdata.data![index].name),
+        leading: Image.network(listdata.data![index].imageMedium),
+        trailing:
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey),
       ),
     );
   }
