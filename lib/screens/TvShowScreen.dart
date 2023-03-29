@@ -84,7 +84,9 @@ class TvShowState extends State<TvShow> {
       ),
       child: ListTile(
         onTap: () {
-          NavigationHelper().detailPush(context, listdata, index, 'TV Shows');
+          setState(() {
+            NavigationHelper().detailPush(context, listdata, index, 'TV Shows');
+          });
         },
         title: Text(listdata.data![index].name),
         leading: Image.network(listdata.data![index].imageMedium),
@@ -144,7 +146,7 @@ class NavigationHelper {
     AsyncSnapshot<List<Show>> listdata,
     int index,
     String previousPageName,
-  ) async {
+  ) {
     return Navigator.push(
       context,
       MaterialPageRoute(
@@ -176,6 +178,7 @@ class NavigationHelper {
                 icon: Icon(Icons.arrow_back_ios),
                 onPressed: () {
                   Navigator.of(context).pop();
+                  setState() {}
                 },
               ),
               backgroundColor: Colors.orangeAccent,

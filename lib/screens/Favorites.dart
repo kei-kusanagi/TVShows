@@ -31,45 +31,44 @@ class FavoritesState extends State<Favorites> {
     _refreshFavorites();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Center(child: Text('Favorites')),
-          backgroundColor: Colors.purple,
-        ),
-        body: ListView.builder(
-          itemCount: _favorites.length,
-          itemBuilder: (context, index) {
-            return Slidable(
-              key: Key(_favorites[index].toString()),
-              endActionPane: ActionPane(
-                motion: const ScrollMotion(),
-                children: [
-                  SlidableAction(
-                    onPressed: (BuildContext context) {
-                      deleteTVshow(context, _favorites[index]['id'],
-                          _favorites[index]['name'], true);
-                    },
-                    backgroundColor: const Color(0xFFFE4A49),
-                    foregroundColor: Colors.white,
-                    icon: Icons.delete,
-                    label: 'Delete',
-                  ),
-                ],
-              ),
-              child: ListTile(
-                onTap: () {
-                  _showDetail(_favorites[index]);
-                },
-                leading: Image(
-                  image: NetworkImage(_favorites[index]['imageMedium']),
+      home: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Center(child: Text('Favorites')),
+            backgroundColor: Colors.purple,
+          ),
+          body: ListView.builder(
+            itemCount: _favorites.length,
+            itemBuilder: (context, index) {
+              return Slidable(
+                key: Key(_favorites[index].toString()),
+                endActionPane: ActionPane(
+                  motion: const ScrollMotion(),
+                  children: [
+                    SlidableAction(
+                      onPressed: (BuildContext context) {
+                        deleteTVshow(context, _favorites[index]['id'],
+                            _favorites[index]['name'], true);
+                      },
+                      backgroundColor: const Color(0xFFFE4A49),
+                      foregroundColor: Colors.white,
+                      icon: Icons.delete,
+                      label: 'Delete',
+                    ),
+                  ],
                 ),
-                title: Text(_favorites[index]['name']),
-                // subtitle: Text(favorites[index].imdb),
-                trailing: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: Colors.grey),
-              ),
-            );
-          },
+                child: ListTile(
+                  onTap: () {
+                    _showDetail(_favorites[index]);
+                  },
+                  title: Text(_favorites[index]['name']),
+                  leading: Image.network(_favorites[index]['imageMedium']),
+                  trailing: const Icon(Icons.arrow_forward_ios_rounded,
+                      color: Colors.grey),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -120,60 +119,117 @@ class FavoritesState extends State<Favorites> {
   }
 
   void _showDetail(Map<String, dynamic> showData) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return Scaffold(
-        appBar: AppBar(
-          actions: [
-            IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                deleteTVshow(context, showData['id'], showData['name'], false);
-              },
-            )
-          ],
-          backgroundColor: Colors.orangeAccent,
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Favorites',
-                style: TextStyle(fontSize: 16),
-              ),
-              Text(
-                showData['name'],
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        ),
-        body: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            final double screenWidth = constraints.maxWidth;
-
-            if (screenWidth > 600) {
-              // Pantalla grande
-              return Row(
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return Scaffold(
+            appBar: AppBar(
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    deleteTVshow(
+                        context, showData['id'], showData['name'], false);
+                  },
+                )
+              ],
+              backgroundColor: Colors.orangeAccent,
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Center(
-                        child: Image(
-                          image: NetworkImage(showData['imageMedium']),
+                  Text(
+                    'Favorites',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Text(
+                    showData['name'],
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+            body: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                final double screenWidth = constraints.maxWidth;
+
+                if (screenWidth > 600) {
+                  // Pantalla grande
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Center(
+                            child: Image(
+                              image: NetworkImage(showData['imageMedium']),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Row(
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      InkWell(
+                                        child: Text(
+                                          'IMDb: ${showData['imdb']}',
+                                          style: const TextStyle(
+                                            decoration:
+                                                TextDecoration.underline,
+                                            color: Colors.blue,
+                                          ),
+                                        ),
+                                        onTap: () {
+                                          launch(Uri.parse(
+                                                  'https://www.imdb.com/title/${showData['imdb']}')
+                                              .toString());
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Spacer(),
+                                Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Text('Rating: ${showData['rating']}'),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: HtmlWidget(
+                                showData['summary'],
+                                // style: const TextStyle(fontSize: 20.0),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Pantalla pequeña
+                  return SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Image(
+                          image: NetworkImage(showData['imageMedium']),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
                             children: [
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   InkWell(
                                     child: Text(
@@ -195,70 +251,22 @@ class FavoritesState extends State<Favorites> {
                               Text('Rating: ${showData['rating']}'),
                             ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: HtmlWidget(
-                              showData['summary'],
-                              // style: const TextStyle(fontSize: 20.0),
-                            ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: HtmlWidget(
+                            showData['summary'],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              );
-            } else {
-              // Pantalla pequeña
-              return SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Image(
-                      image: NetworkImage(showData['imageMedium']),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              InkWell(
-                                child: Text(
-                                  'IMDb: ${showData['imdb']}',
-                                  style: const TextStyle(
-                                    decoration: TextDecoration.underline,
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                                onTap: () {
-                                  launch(Uri.parse(
-                                          'https://www.imdb.com/title/${showData['imdb']}')
-                                      .toString());
-                                },
-                              ),
-                            ],
-                          ),
-                          Spacer(),
-                          Text('Rating: ${showData['rating']}'),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: HtmlWidget(
-                        showData['summary'],
-                        // style: const TextStyle(fontSize: 20.0),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-          },
-        ),
-      );
-    }));
+                  );
+                }
+              },
+            ),
+          );
+        },
+      ),
+    );
   }
 }
