@@ -16,43 +16,47 @@ class TvShowState extends State<TvShow> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: Center(child: const Text("TV Shows")),
-          backgroundColor: Colors.purple,
-        ),
-        body: FutureBuilder<List<Show>>(
-          future: fetchShows(),
-          builder: (context, listdata) {
-            if (listdata.hasData) {
-              return ListView.builder(
-                itemCount: listdata.data!.length,
-                itemBuilder: (context, index) {
-                  Future<bool> isFavorite =
-                      SQLHelper.getIMDB(listdata.data![index].imdb);
-                  return FutureBuilder<bool>(
-                    future: isFavorite,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        bool isFavorite = snapshot.data!;
-                        if (isFavorite) {
-                          return removeFavoritesSlidable(
-                              listdata, index, context);
+      home: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Center(child: const Text("TV Shows")),
+            backgroundColor: Colors.purple,
+          ),
+          body: FutureBuilder<List<Show>>(
+            future: fetchShows(),
+            builder: (context, listdata) {
+              if (listdata.hasData) {
+                return ListView.builder(
+                  itemCount: listdata.data!.length,
+                  itemBuilder: (context, index) {
+                    Future<bool> isFavorite =
+                        SQLHelper.getIMDB(listdata.data![index].imdb);
+                    return FutureBuilder<bool>(
+                      future: isFavorite,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          bool isFavorite = snapshot.data!;
+                          if (isFavorite) {
+                            return removeFavoritesSlidable(
+                                listdata, index, context);
+                          } else {
+                            return addFavoritesSlidable(
+                                listdata, index, context);
+                          }
                         } else {
-                          return addFavoritesSlidable(listdata, index, context);
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }
-                      } else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    },
-                  );
-                },
-              );
-            } else if (listdata.hasError) {
-              return Text("${listdata.error}");
-            }
-            return const Center(child: CircularProgressIndicator());
-          },
+                      },
+                    );
+                  },
+                );
+              } else if (listdata.hasError) {
+                return Text("${listdata.error}");
+              }
+              return const Center(child: CircularProgressIndicator());
+            },
+          ),
         ),
       ),
     );
