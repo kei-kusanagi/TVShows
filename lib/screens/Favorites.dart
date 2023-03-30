@@ -75,7 +75,7 @@ class FavoritesState extends State<Favorites> {
   }
 
   late String showName;
-  deleteTVshow(BuildContext context, _favorites, showName, bool slidable) {
+  deleteTVshow(BuildContext context, id, showName, bool slidable) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -96,7 +96,7 @@ class FavoritesState extends State<Favorites> {
               onPressed: () {
                 if (mounted) {
                   setState(() {
-                    SQLHelper.deleteItem(_favorites as int);
+                    SQLHelper.deleteItem(id);
                   });
                   if (slidable == false) {
                     Navigator.pop(context);
@@ -205,9 +205,11 @@ class FavoritesState extends State<Favorites> {
                             ),
                             Padding(
                               padding: const EdgeInsets.all(12.0),
-                              child: HtmlWidget(
-                                showData['summary'],
-                                // style: const TextStyle(fontSize: 20.0),
+                              child: SingleChildScrollView(
+                                child: HtmlWidget(
+                                  showData['summary'],
+                                  // style: const TextStyle(fontSize: 20.0),
+                                ),
                               ),
                             ),
                           ],
@@ -254,8 +256,10 @@ class FavoritesState extends State<Favorites> {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(12.0),
-                          child: HtmlWidget(
-                            showData['summary'],
+                          child: SingleChildScrollView(
+                            child: HtmlWidget(
+                              showData['summary'],
+                            ),
                           ),
                         ),
                       ],
