@@ -2,8 +2,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:tv_show/api/api.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:tv_show/screens/Favorites.dart';
-import 'package:tv_show/sql/sql_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TvShow extends StatefulWidget {
@@ -12,6 +10,24 @@ class TvShow extends StatefulWidget {
 }
 
 class TvShowState extends State<TvShow> {
+  List<Show> shows = [];
+  @override
+  void initState() {
+    super.initState();
+    _loadShows();
+  }
+
+  Future<void> _loadShows() async {
+    try {
+      var shows = await fetchShows();
+      setState(() {
+        shows = shows;
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,39 +38,15 @@ class TvShowState extends State<TvShow> {
             title: Center(child: const Text("TV Shows")),
             backgroundColor: Colors.purple,
           ),
-          body: FutureBuilder<List<Show>>(
-            future: fetchShows(),
-            builder: (context, listdata) {
-              if (listdata.hasData) {
-                return ListView.builder(
-                  itemCount: listdata.data!.length,
-                  itemBuilder: (context, index) {
-                    Future<bool> isFavorite =
-                        SQLHelper.getIMDB(listdata.data![index].imdb);
-                    return FutureBuilder<bool>(
-                      future: isFavorite,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          bool isFavorite = snapshot.data!;
-                          if (isFavorite) {
-                            return removeFavoritesSlidable(
-                                listdata, index, context);
-                          } else {
-                            return addFavoritesSlidable(
-                                listdata, index, context);
-                          }
-                        } else {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        }
-                      },
-                    );
-                  },
-                );
-              } else if (listdata.hasError) {
-                return Text("${listdata.error}");
-              }
-              return const Center(child: CircularProgressIndicator());
+          body: ListView.builder(
+            itemCount: shows.length,
+            itemBuilder: (context, index) {
+              final show = shows[index];
+              return ListTile(
+                title: Text(show.name),
+                subtitle: Text(show.summary),
+                leading: Image.network(show.imageMedium),
+              );
             },
           ),
         ),
@@ -73,7 +65,7 @@ class TvShowState extends State<TvShow> {
             onPressed: (BuildContext context) {
               setState(
                 () {
-                  SQLHelper.deleteItem(listdata.data![index].id as int);
+                  // SQLHelper.deleteItem(listdata.data![index].id as int);
                   // FavoritesState.deleteTVshow(context, listdata.data![index].id,
                   //     listdata.data![index].name, true);
                 },
@@ -111,14 +103,14 @@ class TvShowState extends State<TvShow> {
             onPressed: (BuildContext context) {
               setState(
                 () {
-                  SQLHelper.createItem(
-                      listdata.data![index].id as int,
-                      listdata.data![index].name as String,
-                      listdata.data![index].summary as String,
-                      listdata.data![index].imageOriginal as String,
-                      listdata.data![index].imageMedium as String,
-                      listdata.data![index].imdb as String,
-                      listdata.data![index].rating as double);
+                  // SQLHelper.createItem(
+                  //     listdata.data![index].id as int,
+                  //     listdata.data![index].name as String,
+                  //     listdata.data![index].summary as String,
+                  //     listdata.data![index].imageOriginal as String,
+                  //     listdata.data![index].imageMedium as String,
+                  //     listdata.data![index].imdb as String,
+                  //     listdata.data![index].rating as double);
                 },
               );
             },
@@ -160,14 +152,14 @@ class NavigationHelper {
               actions: [
                 IconButton(
                     onPressed: () {
-                      SQLHelper.createItem(
-                          listdata.data![index].id as int,
-                          listdata.data![index].name as String,
-                          listdata.data![index].summary as String,
-                          listdata.data![index].imageOriginal as String,
-                          listdata.data![index].imageMedium as String,
-                          listdata.data![index].imdb as String,
-                          listdata.data![index].rating as double);
+                      // SQLHelper.createItem(
+                      //     listdata.data![index].id as int,
+                      //     listdata.data![index].name as String,
+                      //     listdata.data![index].summary as String,
+                      //     listdata.data![index].imageOriginal as String,
+                      //     listdata.data![index].imageMedium as String,
+                      //     listdata.data![index].imdb as String,
+                      //     listdata.data![index].rating as double);
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

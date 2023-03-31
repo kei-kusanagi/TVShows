@@ -14,21 +14,18 @@ class Favorites extends StatefulWidget {
 class FavoritesState extends State<Favorites> {
   List<Map<String, dynamic>> _favorites = [];
 
-  bool _isLoading = true;
-
+  // bool _isLoading = true;
   late bool slidable;
-
-  void _refreshFavorites() async {
-    final data = await SQLHelper.getItems();
-    setState(() {
-      _favorites = data;
-      _isLoading = false;
-    });
-  }
+  // void _refreshFavorites() async {
+  //   final data = await _initDatabase();
+  //   setState(() {
+  //     _favorites = data;
+  //     _isLoading = false;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
-    _refreshFavorites();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SafeArea(
@@ -96,7 +93,7 @@ class FavoritesState extends State<Favorites> {
               onPressed: () {
                 if (mounted) {
                   setState(() {
-                    SQLHelper.deleteItem(id);
+                    // SQLHelper.delete(id);
                   });
                   if (slidable == false) {
                     Navigator.pop(context);

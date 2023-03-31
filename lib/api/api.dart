@@ -1,36 +1,50 @@
 import 'dart:convert';
-import 'package:api_cache_manager/models/cache_db_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:api_cache_manager/api_cache_manager.dart';
 
 class Show {
-  final int id;
-  final String name;
-  final String summary;
-  final String imageOriginal;
-  final String imageMedium;
-  final String imdb;
-  final dynamic rating;
+  String apiId;
+  String name;
+  String summary;
+  String imageOriginal;
+  String imageMedium;
+  String imdb;
+  double rating;
+  bool favorite;
 
   Show({
-    required this.id,
+    required this.apiId,
     required this.name,
     required this.summary,
     required this.imageOriginal,
     required this.imageMedium,
     required this.imdb,
     required this.rating,
+    required this.favorite,
   });
 
-  factory Show.fromJson(Map<String, dynamic> json) {
+  Map<String, dynamic> toMap() {
+    return {
+      'api_id': apiId,
+      'name': name,
+      'summary': summary,
+      'image_original': imageOriginal,
+      'image_medium': imageMedium,
+      'imdb': imdb,
+      'rating': rating,
+      'favorite': favorite ? 1 : 0,
+    };
+  }
+
+  factory Show.fromMap(Map<String, dynamic> map) {
     return Show(
-      id: json['id'],
-      name: json['name'],
-      summary: json['summary'],
-      imageOriginal: json['image']['original'],
-      imageMedium: json['image']['medium'],
-      imdb: json['externals'] != null ? json['externals']['imdb'] ?? '' : '',
-      rating: json['rating'] != null ? json['rating']['average'] ?? 0.0 : 0.0,
+      apiId: map['api_id'],
+      name: map['name'],
+      summary: map['summary'],
+      imageOriginal: map['image_original'],
+      imageMedium: map['image_medium'],
+      imdb: map['imdb'],
+      rating: map['rating'],
+      favorite: map['favorite'] == 1,
     );
   }
 }
@@ -40,7 +54,7 @@ Future<List<Show>> fetchShows() async {
 
   if (response.statusCode == 200) {
     final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
-    return parsed.map<Show>((json) => Show.fromJson(json)).toList();
+    return parsed.map<Show>((json) => Show.fromMap(json)).toList();
   } else {
     throw Exception('Failed to load shows');
   }
