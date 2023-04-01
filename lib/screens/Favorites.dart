@@ -19,7 +19,7 @@ class FavoritesState extends State<Favorites> {
   late bool slidable;
 
   void _refreshFavorites() async {
-    final data = await SQLHelper.getItems();
+    final data = await SQLHelper.getFavorites();
     setState(() {
       _favorites = data;
       _isLoading = false;
