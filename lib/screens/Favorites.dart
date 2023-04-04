@@ -139,7 +139,7 @@ class FavoritesState extends State<Favorites> {
             appBar: AppBar(
               actions: [
                 IconButton(
-                  icon: Icon(Icons.delete),
+                  icon: const Icon(Icons.delete),
                   onPressed: () {
                     deleteTVshow(
                         context, showData['id'], showData['name'], false);
@@ -150,13 +150,14 @@ class FavoritesState extends State<Favorites> {
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Favorites',
                     style: TextStyle(fontSize: 16),
                   ),
                   Text(
                     showData['name'],
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -209,7 +210,7 @@ class FavoritesState extends State<Favorites> {
                                     ],
                                   ),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 Padding(
                                   padding: const EdgeInsets.all(20.0),
                                   child: Text('Rating: ${showData['rating']}'),
@@ -262,7 +263,7 @@ class FavoritesState extends State<Favorites> {
                                   ),
                                 ],
                               ),
-                              Spacer(),
+                              const Spacer(),
                               Text('Rating: ${showData['rating']}'),
                             ],
                           ),
