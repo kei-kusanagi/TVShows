@@ -13,21 +13,23 @@ class TvShow extends StatefulWidget {
 
 class TvShowState extends State<TvShow> {
   List<Map<String, dynamic>> _tvShows = [];
-  bool _isLoading = true;
 
-  late bool slidable;
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
 
-  void _refreshTvShows() async {
-    final data = await SQLHelper.getItems();
+  Future<void> _loadData() async {
+    final items = await SQLHelper.getItems();
     setState(() {
-      _tvShows = data;
-      _isLoading = false;
+      _tvShows = items;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    _refreshTvShows();
+    _loadData();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SafeArea(
@@ -80,14 +82,14 @@ class TvShowState extends State<TvShow> {
                   motion: const ScrollMotion(),
                   children: [
                     SlidableAction(
-                      onPressed: (BuildContext context) {
-                        // deleteTVshow(context, _favorites[index]['id'],
-                        //     _favorites[index]['name'], true);
+                      onPressed: (BuildContext context) async {
+                        await SQLHelper.updateFavorite(
+                            _tvShows[index]['id'], true);
                       },
-                      backgroundColor: const Color(0xFFFE4A49),
+                      backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
-                      icon: Icons.delete,
-                      label: 'Delete',
+                      icon: Icons.favorite_border,
+                      label: 'Add Favorites',
                     ),
                   ],
                 ),
@@ -107,87 +109,6 @@ class TvShowState extends State<TvShow> {
       ),
     );
   }
-
-  // Slidable removeFavoritesSlidable(
-  //     AsyncSnapshot<List<Show>> listdata, int index, BuildContext context) {
-  //   return Slidable(
-  //     key: Key(listdata.data![index].toString()),
-  //     endActionPane: ActionPane(
-  //       motion: ScrollMotion(),
-  //       children: [
-  //         SlidableAction(
-  //           onPressed: (BuildContext context) {
-  //             setState(
-  //               () {
-  //                 SQLHelper.deleteItem(listdata.data![index].id as int);
-  //                 // FavoritesState.deleteTVshow(context, listdata.data![index].id,
-  //                 //     listdata.data![index].name, true);
-  //               },
-  //             );
-  //           },
-  //           backgroundColor: Colors.red,
-  //           foregroundColor: Colors.black,
-  //           icon: Icons.delete,
-  //           label: 'Remove to Favorites',
-  //         ),
-  //       ],
-  //     ),
-  //     child: ListTile(
-  //       onTap: () {
-  //         setState(() {
-  //           NavigationHelper().detailPush(context, listdata, index, 'TV Shows');
-  //         });
-  //       },
-  //       title: Text(listdata.data![index].name),
-  //       leading: Image.network(listdata.data![index].imageMedium),
-  //       trailing:
-  //           const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey),
-  //     ),
-  //   );
-  // }
-
-  // Slidable addFavoritesSlidable(
-  //     AsyncSnapshot<List<Show>> listdata, int index, BuildContext context) {
-  //   return Slidable(
-  //     key: Key(listdata.data![index].toString()),
-  //     endActionPane: ActionPane(
-  //       motion: ScrollMotion(),
-  //       children: [
-  //         SlidableAction(
-  //           onPressed: (BuildContext context) {
-  //             setState(
-  //               () {
-  //                 SQLHelper.createItem(
-  //                     listdata.data![index].id as int,
-  //                     listdata.data![index].name as String,
-  //                     listdata.data![index].summary as String,
-  //                     listdata.data![index].imageOriginal as String,
-  //                     listdata.data![index].imageMedium as String,
-  //                     listdata.data![index].imdb as String,
-  //                     listdata.data![index].rating as double);
-  //               },
-  //             );
-  //           },
-  //           backgroundColor: Colors.green,
-  //           foregroundColor: Colors.black,
-  //           icon: Icons.save,
-  //           label: 'Add to Favorites',
-  //         ),
-  //       ],
-  //     ),
-  //     child: ListTile(
-  //       onTap: () {
-  //         setState(() {
-  //           NavigationHelper().detailPush(context, listdata, index, 'TV Shows');
-  //         });
-  //       },
-  //       title: Text(listdata.data![index].name),
-  //       leading: Image.network(listdata.data![index].imageMedium),
-  //       trailing:
-  //           const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey),
-  //     ),
-  //   );
-  // }
 }
 
 // class NavigationHelper {

@@ -1,9 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:tv_show/screens/Favorites.dart';
+import 'package:tv_show/sql/sql_helper.dart';
+import 'api/api.dart';
 import 'screens/TvShowScreen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final database = await SQLHelper.db();
+  await SQLHelper.createTables(database);
+  await populateDatabase(database);
   runApp(MyApp());
+}
+
+Future<void> populateDatabase(Database database) async {
+  final shows = await fetchShows();
+  for (final show in shows) {
+    await SQLHelper.createItem(
+      show.id,
+      show.name,
+      show.summary,
+      show.imageOriginal,
+      show.imageMedium,
+      show.imdb,
+      show.rating,
+    );
+  }
 }
 
 class MyApp extends StatefulWidget {

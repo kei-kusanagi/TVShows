@@ -1,20 +1,20 @@
-import 'dart:ffi';
-
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart' as sql;
+import '../api/api.dart';
 
 class SQLHelper {
   static Future<void> createTables(sql.Database database) async {
+    await database.execute('DROP TABLE IF EXISTS items');
     await database.execute("""CREATE TABLE items(
-      id INTEGER AUTOINCREMENT NOT NULL,
-      api_id INTEGER PRIMARY KEY UNIQUE,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      api_id INTEGER UNIQUE,
       name TEXT,
       summary TEXT,
       imageOriginal TEXT ,
       imageMedium TEXT,
       imdb TEXT,
-      rating REAL
-      favorite BOOLEAN
+      rating REAL,
+      favorite INTEGER DEFAULT 0
       )
       """);
   }
@@ -36,7 +36,7 @@ class SQLHelper {
       String? imageOriginal,
       String? imageMedium,
       String? imdb,
-      double? rating) async {
+      num? rating) async {
     final db = await SQLHelper.db();
 
     final data = {
@@ -61,13 +61,8 @@ class SQLHelper {
   static Future<List<Map<String, dynamic>>> getFavorites() async {
     final db = await SQLHelper.db();
     return await db.query('items',
-        where: 'favorites = ?', whereArgs: [true], orderBy: 'id');
+        where: 'favorite = ?', whereArgs: [true], orderBy: 'id');
   }
-
-  // static Future<List<Map<String, dynamic>>> getItem(int id) async {
-  //   final db = await SQLHelper.db();
-  //   return db.query('items', orderBy: 'id = ?', whereArgs: [id], limit: 1);
-  // }
 
   static Future<bool> getIMDB(String imdb) async {
     final db = await SQLHelper.db();
@@ -76,39 +71,13 @@ class SQLHelper {
     return maps.isNotEmpty;
   }
 
-  // static Future<int> updateItem(
-  //     int id,
-  //     String api_id,
-  //     String name,
-  //     String summary,
-  //     String image_original,
-  //     String image_medium,
-  //     String imdb,
-  //     double rating) async {
-  //   final db = await SQLHelper.db();
-  //
-  //   final data = {
-  //     'api_id': api_id,
-  //     'name': name,
-  //     'summary': summary,
-  //     'image_original': image_original,
-  //     'image_medium': image_medium,
-  //     'imdb': imdb,
-  //     'rating': rating
-  //   };
-  //
-  //   final result =
-  //       await db.update('items', data, where: 'id = ?', whereArgs: [id]);
-  //   return result;
-  // }
-
-  static Future<void> updateFavorite(int api_id, bool favorite) async {
+  static Future<void> updateFavorite(int id, bool favorite) async {
     final db = await SQLHelper.db();
     await db.update(
-      'shows',
+      'items',
       {'favorite': favorite ? 1 : 0},
-      where: 'api_id = ?',
-      whereArgs: [api_id],
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 
@@ -118,6 +87,22 @@ class SQLHelper {
       await db.delete('items', where: 'id = ?', whereArgs: [api_id]);
     } catch (err) {
       debugPrint('Something went wrong when deleting an item: $err');
+    }
+  }
+
+  Future<void> populateDatabase() async {
+    final shows = await fetchShows();
+
+    for (final show in shows) {
+      await SQLHelper.createItem(
+        show.id,
+        show.name,
+        show.summary,
+        show.imageOriginal,
+        show.imageMedium,
+        show.imdb,
+        show.rating,
+      );
     }
   }
 }

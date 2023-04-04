@@ -12,23 +12,18 @@ class Favorites extends StatefulWidget {
 }
 
 class FavoritesState extends State<Favorites> {
-  List<Map<String, dynamic>> _favorites = [];
-
-  bool _isLoading = true;
+  late Future<List<Map<String, dynamic>>> favoritesFuture;
 
   late bool slidable;
 
-  void _refreshFavorites() async {
-    final data = await SQLHelper.getFavorites();
-    setState(() {
-      _favorites = data;
-      _isLoading = false;
-    });
+  @override
+  void initState() {
+    super.initState();
+    favoritesFuture = SQLHelper.getFavorites();
   }
 
   @override
   Widget build(BuildContext context) {
-    _refreshFavorites();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SafeArea(
@@ -37,36 +32,55 @@ class FavoritesState extends State<Favorites> {
             title: const Center(child: Text('Favorites')),
             backgroundColor: Colors.purple,
           ),
-          body: ListView.builder(
-            itemCount: _favorites.length,
-            itemBuilder: (context, index) {
-              return Slidable(
-                key: Key(_favorites[index].toString()),
-                endActionPane: ActionPane(
-                  motion: const ScrollMotion(),
-                  children: [
-                    SlidableAction(
-                      onPressed: (BuildContext context) {
-                        deleteTVshow(context, _favorites[index]['id'],
-                            _favorites[index]['name'], true);
-                      },
-                      backgroundColor: const Color(0xFFFE4A49),
-                      foregroundColor: Colors.white,
-                      icon: Icons.delete,
-                      label: 'Delete',
-                    ),
-                  ],
-                ),
-                child: ListTile(
-                  onTap: () {
-                    _showDetail(_favorites[index]);
+          body: FutureBuilder<List<Map<String, dynamic>>>(
+            future: favoritesFuture,
+            builder: (BuildContext context,
+                AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+              if (snapshot.hasData) {
+                final favorites = snapshot.data!;
+
+                return ListView.builder(
+                  itemCount: favorites.length,
+                  itemBuilder: (context, index) {
+                    final favorite = favorites[index];
+                    return Slidable(
+                      key: Key(favorite.toString()),
+                      endActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            onPressed: (BuildContext context) {
+                              deleteTVshow(context, favorites[index]['id'],
+                                  favorites[index]['name'], true);
+                            },
+                            backgroundColor: const Color(0xFFFE4A49),
+                            foregroundColor: Colors.white,
+                            icon: Icons.delete,
+                            label: 'Delete',
+                          ),
+                        ],
+                      ),
+                      child: ListTile(
+                        onTap: () {
+                          _showDetail(favorite);
+                        },
+                        title: Text(favorite['name']),
+                        leading: Image.network(favorite['imageMedium']),
+                        trailing: const Icon(Icons.arrow_forward_ios_rounded,
+                            color: Colors.grey),
+                      ),
+                    );
                   },
-                  title: Text(_favorites[index]['name']),
-                  leading: Image.network(_favorites[index]['imageMedium']),
-                  trailing: const Icon(Icons.arrow_forward_ios_rounded,
-                      color: Colors.grey),
-                ),
-              );
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${snapshot.error}'),
+                );
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
             },
           ),
         ),
@@ -93,17 +107,16 @@ class FavoritesState extends State<Favorites> {
               ),
             ),
             TextButton(
-              onPressed: () {
-                if (mounted) {
-                  setState(() {
-                    SQLHelper.deleteItem(id);
-                  });
-                  if (slidable == false) {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  } else {
-                    Navigator.pop(context);
-                  }
+              onPressed: () async {
+                await SQLHelper.updateFavorite(id, false);
+                setState(() {
+                  favoritesFuture = SQLHelper.getFavorites();
+                });
+                if (slidable == false) {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                } else {
+                  Navigator.pop(context);
                 }
               },
               child: const Text(
