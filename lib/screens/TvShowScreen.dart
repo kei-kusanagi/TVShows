@@ -1,6 +1,7 @@
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:tv_show/screens/DetailScreen.dart';
 import 'package:tv_show/sql/sql_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -46,21 +47,37 @@ class TvShowState extends State<TvShow> {
                 endActionPane: ActionPane(
                   motion: const ScrollMotion(),
                   children: [
-                    SlidableAction(
-                      onPressed: (BuildContext context) async {
-                        await SQLHelper.updateFavorite(
-                            _tvShows[index]['id'], true);
-                      },
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      icon: Icons.favorite_border,
-                      label: 'Add Favorites',
-                    ),
+                    _tvShows[index]['favorite'] == 1
+                        ? SlidableAction(
+                            onPressed: (BuildContext context) async {
+                              await SQLHelper.updateFavorite(
+                                  _tvShows[index]['id'], false);
+                            },
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            icon: Icons.delete_outline,
+                            label: 'Remove from Favorites',
+                          )
+                        : SlidableAction(
+                            onPressed: (BuildContext context) async {
+                              await SQLHelper.updateFavorite(
+                                  _tvShows[index]['id'], true);
+                            },
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            icon: Icons.favorite_border,
+                            label: 'Add to Favorites',
+                          ),
                   ],
                 ),
                 child: ListTile(
                   onTap: () {
-                    _showDetail(_tvShows[index]);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ShowDetailPage(
+                                  showData: _tvShows[index],
+                                )));
                   },
                   title: Text(_tvShows[index]['name']),
                   leading: Image.network(_tvShows[index]['imageMedium']),
@@ -75,19 +92,29 @@ class TvShowState extends State<TvShow> {
     );
   }
 
-  void _showDetail(Map<String, dynamic> showData) {
+  void _showDetail(Map<String, dynamic> showData) async {
+    bool isFavorite = showData['favorite'] == 1;
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
           return Scaffold(
             appBar: AppBar(
               actions: [
-                IconButton(
-                    icon: const Icon(Icons.favorite),
-                    onPressed: () {
+                ElevatedButton(
+                  onPressed: () async {
+                    if (isFavorite) {
+                      setState(() => isFavorite = false);
+
+                      SQLHelper.updateFavorite(showData['id'], false);
+                    } else {
+                      setState(() => isFavorite = true);
                       SQLHelper.updateFavorite(showData['id'], true);
-                      favoritesFuture = SQLHelper.getFavorites();
-                    }),
+                    }
+                  },
+                  child: isFavorite
+                      ? Icon(Icons.favorite, color: Colors.red)
+                      : Icon(Icons.favorite_border),
+                ),
               ],
               backgroundColor: Colors.orangeAccent,
               title: Column(
