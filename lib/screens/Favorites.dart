@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:tv_show/screens/DetailScreen.dart';
 import '../sql/sql_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -56,13 +60,19 @@ class FavoritesState extends State<Favorites> {
                             backgroundColor: const Color(0xFFFE4A49),
                             foregroundColor: Colors.white,
                             icon: Icons.delete,
-                            label: 'Delete',
+                            label: 'Remove from Favorites',
                           ),
                         ],
                       ),
                       child: ListTile(
                         onTap: () {
                           _showDetail(favorite);
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => ShowDetailPage(
+                          //               showData: favorite,
+                          //             )));
                         },
                         title: Text(favorite['name']),
                         leading: Image.network(favorite['imageMedium']),
@@ -90,10 +100,48 @@ class FavoritesState extends State<Favorites> {
 
   late String showName;
   deleteTVshow(BuildContext context, id, showName, bool slidable) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
+    if (Theme.of(context).platform == TargetPlatform.iOS) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => CupertinoAlertDialog(
+          title: const Text("Remove to Favorites"),
+          content: Text(
+              '${"Are you sure you want to remove " + showName} from favorites?'),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'Cancel',
+              ),
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              onPressed: () async {
+                await SQLHelper.updateFavorite(id, false);
+                setState(() {
+                  favoritesFuture = SQLHelper.getFavorites();
+                });
+                if (slidable == false) {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                } else {
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text(
+                'Remove',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
           title: const Text("Remove to Favorites"),
           content: Text(
               '${"Are you sure you want to remove " + showName} from favorites?'),
@@ -125,10 +173,9 @@ class FavoritesState extends State<Favorites> {
               ),
             ),
           ],
-        );
-      },
-    );
-    // Navigator.pop(context);
+        ),
+      );
+    }
   }
 
   void _showDetail(Map<String, dynamic> showData) {
