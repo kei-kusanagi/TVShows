@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -80,7 +81,13 @@ class TvShowState extends State<TvShow> {
                                 )));
                   },
                   title: Text(_tvShows[index]['name']),
-                  leading: Image.network(_tvShows[index]['imageMedium']),
+                  // leading: Image.network(_tvShows[index]['imageMedium']),
+                  leading: CachedNetworkImage(
+                    imageUrl: _tvShows[index]['imageMedium'],
+                    placeholder: (context, url) => CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+                  ),
+
                   trailing: const Icon(Icons.arrow_forward_ios_rounded,
                       color: Colors.grey),
                 ),
@@ -144,8 +151,12 @@ class TvShowState extends State<TvShow> {
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Center(
-                            child: Image(
-                              image: NetworkImage(showData['imageMedium']),
+                            child: CachedNetworkImage(
+                              imageUrl: showData['imageMedium'],
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
                             ),
                           ),
                         ),
@@ -207,8 +218,12 @@ class TvShowState extends State<TvShow> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Image(
-                          image: NetworkImage(showData['imageMedium']),
+                        CachedNetworkImage(
+                          imageUrl: showData['imageMedium'],
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),

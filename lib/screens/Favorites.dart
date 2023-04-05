@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -75,7 +76,15 @@ class FavoritesState extends State<Favorites> {
                           //             )));
                         },
                         title: Text(favorite['name']),
-                        leading: Image.network(favorite['imageMedium']),
+                        leading:
+                            // Image.network(favorite['imageMedium']),
+                            CachedNetworkImage(
+                          imageUrl: favorite['imageMedium'],
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
                         trailing: const Icon(Icons.arrow_forward_ios_rounded,
                             color: Colors.grey),
                       ),
@@ -221,8 +230,15 @@ class FavoritesState extends State<Favorites> {
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Center(
-                            child: Image(
-                              image: NetworkImage(showData['imageMedium']),
+                            // child: Image(
+                            //   image: NetworkImage(showData['imageMedium']),
+                            // ),
+                            child: CachedNetworkImage(
+                              imageUrl: showData['imageMedium'],
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
                             ),
                           ),
                         ),
@@ -284,8 +300,15 @@ class FavoritesState extends State<Favorites> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Image(
-                          image: NetworkImage(showData['imageMedium']),
+                        // Image(
+                        //   image: NetworkImage(showData['imageMedium']),
+                        // ),
+                        CachedNetworkImage(
+                          imageUrl: showData['imageMedium'],
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),

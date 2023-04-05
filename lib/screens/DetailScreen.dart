@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -75,8 +76,14 @@ class ShowDetailPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Center(
-                      child: Image(
-                        image: NetworkImage(showData['imageMedium']),
+                      // child: Image(
+                      //   image: NetworkImage(showData['imageMedium']),
+                      // ),
+                      child: CachedNetworkImage(
+                        imageUrl: showData['imageMedium'],
+                        placeholder: (context, url) =>
+                            CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
                       ),
                     ),
                   ),
@@ -136,8 +143,13 @@ class ShowDetailPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Image(
-                    image: NetworkImage(showData['imageMedium']),
+                  // Image(
+                  //   image: NetworkImage(showData['imageMedium']),
+                  // ),
+                  CachedNetworkImage(
+                    imageUrl: showData['imageMedium'],
+                    placeholder: (context, url) => CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -281,8 +293,14 @@ class _ShowFavoritePageState extends State<ShowFavoritePage> {
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Center(
-                      child: Image(
-                        image: NetworkImage(widget.showData['imageMedium']),
+                      // child: Image(
+                      //   image: NetworkImage(widget.showData['imageMedium']),
+                      // ),
+                      child: CachedNetworkImage(
+                        imageUrl: widget.showData['imageMedium'],
+                        placeholder: (context, url) =>
+                            CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
                       ),
                     ),
                   ),
@@ -342,8 +360,13 @@ class _ShowFavoritePageState extends State<ShowFavoritePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Image(
-                    image: NetworkImage(widget.showData['imageMedium']),
+                  // Image(
+                  //   image: NetworkImage(widget.showData['imageMedium']),
+                  // ),
+                  CachedNetworkImage(
+                    imageUrl: widget.showData['imageMedium'],
+                    placeholder: (context, url) => CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
