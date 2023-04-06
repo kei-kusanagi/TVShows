@@ -1,10 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:tv_show/screens/DetailScreen.dart';
 import 'package:tv_show/sql/sql_helper.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class TvShow extends StatefulWidget {
   @override
@@ -19,7 +17,6 @@ class TvShowState extends State<TvShow> {
   @override
   void initState() {
     super.initState();
-    _loadData();
   }
 
   Future<void> _loadData() async {
@@ -73,19 +70,18 @@ class TvShowState extends State<TvShow> {
                 ),
                 child: ListTile(
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ShowDetailPage(
-                                  showData: _tvShows[index],
-                                )));
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          ShowDetailPage(showData: _tvShows[index]),
+                    ));
                   },
                   title: Text(_tvShows[index]['name']),
                   // leading: Image.network(_tvShows[index]['imageMedium']),
                   leading: CachedNetworkImage(
                     imageUrl: _tvShows[index]['imageMedium'],
                     placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    errorWidget: (context, url, error) =>
+                        Icon(Icons.network_check_outlined),
                   ),
 
                   trailing: const Icon(Icons.arrow_forward_ios_rounded,
@@ -95,180 +91,6 @@ class TvShowState extends State<TvShow> {
             },
           ),
         ),
-      ),
-    );
-  }
-
-  void _showDetail(Map<String, dynamic> showData) async {
-    bool isFavorite = showData['favorite'] == 1;
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) {
-          return Scaffold(
-            appBar: AppBar(
-              actions: [
-                ElevatedButton(
-                  onPressed: () async {
-                    if (isFavorite) {
-                      setState(() => isFavorite = false);
-
-                      SQLHelper.updateFavorite(showData['id'], false);
-                    } else {
-                      setState(() => isFavorite = true);
-                      SQLHelper.updateFavorite(showData['id'], true);
-                    }
-                  },
-                  child: isFavorite
-                      ? Icon(Icons.favorite, color: Colors.red)
-                      : Icon(Icons.favorite_border),
-                ),
-              ],
-              backgroundColor: Colors.orangeAccent,
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'TV Shows',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  Text(
-                    showData['name'],
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-            body: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                final double screenWidth = constraints.maxWidth;
-
-                if (screenWidth > 600) {
-                  // Pantalla grande
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Center(
-                            child: CachedNetworkImage(
-                              imageUrl: showData['imageMedium'],
-                              placeholder: (context, url) =>
-                                  CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(Icons.error),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      InkWell(
-                                        child: Text(
-                                          'IMDb: ${showData['imdb']}',
-                                          style: const TextStyle(
-                                            decoration:
-                                                TextDecoration.underline,
-                                            color: Colors.blue,
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          launch(Uri.parse(
-                                                  'https://www.imdb.com/title/${showData['imdb']}')
-                                              .toString());
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Spacer(),
-                                Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Text('Rating: ${showData['rating']}'),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: SingleChildScrollView(
-                                child: HtmlWidget(
-                                  showData['summary'],
-                                  // style: const TextStyle(fontSize: 20.0),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  // Pantalla pequeña
-                  return SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        CachedNetworkImage(
-                          imageUrl: showData['imageMedium'],
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  InkWell(
-                                    child: Text(
-                                      'IMDb: ${showData['imdb']}',
-                                      style: const TextStyle(
-                                        decoration: TextDecoration.underline,
-                                        color: Colors.blue,
-                                      ),
-                                    ),
-                                    onTap: () {
-                                      launch(Uri.parse(
-                                              'https://www.imdb.com/title/${showData['imdb']}')
-                                          .toString());
-                                    },
-                                  ),
-                                ],
-                              ),
-                              const Spacer(),
-                              Text('Rating: ${showData['rating']}'),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: SingleChildScrollView(
-                            child: HtmlWidget(
-                              showData['summary'],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-              },
-            ),
-          );
-        },
       ),
     );
   }

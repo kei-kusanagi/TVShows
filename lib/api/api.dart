@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Show {
-  final int id;
+  // ignore: non_constant_identifier_names
+  final int api_id;
   final String name;
   final String summary;
   final String imageOriginal;
@@ -12,7 +13,8 @@ class Show {
   final bool favorite;
 
   Show({
-    required this.id,
+    // ignore: non_constant_identifier_names
+    required this.api_id,
     required this.name,
     required this.summary,
     required this.imageOriginal,
@@ -24,7 +26,7 @@ class Show {
 
   factory Show.fromJson(Map<String, dynamic> json) {
     return Show(
-      id: json['id'],
+      api_id: json['id'],
       name: json['name'],
       summary: json['summary'],
       imageOriginal: json['image']['original'],
