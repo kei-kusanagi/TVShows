@@ -1,8 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:tv_show/main.dart';
 import '../sql/sql_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -68,6 +71,14 @@ class FavoritesState extends State<Favorites> {
                             builder: (context) => _showDetail(favorite),
                           ));
                         },
+
+                        // onTap: () {
+                        //   Navigator.of(context)
+                        //       .pushReplacement(MaterialPageRoute(
+                        //     builder: (context) => _showDetail(favorite),
+                        //   ));
+                        // },
+
                         title: Text(favorite['name']),
                         leading: CachedImage(favorite),
                         trailing: const Icon(Icons.arrow_forward_ios_rounded,
@@ -93,11 +104,11 @@ class FavoritesState extends State<Favorites> {
   }
 
   late String showName;
-  deleteTVshow(BuildContext context, id, showName, bool slidable) {
+  deleteTVshow(context, id, showName, bool slidable) async {
     if (Theme.of(context).platform == TargetPlatform.iOS) {
-      showDialog(
+      await showDialog(
         context: context,
-        builder: (BuildContext context) => CupertinoAlertDialog(
+        builder: (context) => CupertinoAlertDialog(
           title: const Text("Remove to Favorites"),
           content: RichText(
             text: TextSpan(
@@ -150,9 +161,9 @@ class FavoritesState extends State<Favorites> {
         ),
       );
     } else {
-      showDialog(
+      await showDialog(
         context: context,
-        builder: (BuildContext context) => AlertDialog(
+        builder: (context) => AlertDialog(
           title: const Text("Remove to Favorites"),
           content: RichText(
             text: TextSpan(
@@ -190,7 +201,16 @@ class FavoritesState extends State<Favorites> {
                 });
                 if (slidable == false) {
                   Navigator.pop(context);
-                  Navigator.pop(context);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (context) => MaterialApp(
+                                home: MyApp(
+                              initialIndex: 1,
+                            ))),
+                  );
+
+                  // Navigator.removeRoute(context, deleteTVshow());
+                  // Navigator.pop(context);
                 } else {
                   Navigator.pop(context);
                 }
@@ -350,6 +370,7 @@ class FavoritesState extends State<Favorites> {
   CachedNetworkImage CachedImage(Map<String, dynamic> showData) {
     return CachedNetworkImage(
       imageUrl: showData['imageMedium'],
+      height: 250,
       placeholder: (context, url) => const CircularProgressIndicator(),
       errorWidget: (context, url, error) =>
           const Icon(Icons.network_check_outlined),
