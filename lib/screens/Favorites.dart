@@ -109,15 +109,17 @@ class FavoritesState extends State<Favorites> {
       await showDialog(
         context: context,
         builder: (context) => CupertinoAlertDialog(
-          title: const Text("Remove to Favorites"),
+          title:
+              const Text("Remove to Favorites\n", textAlign: TextAlign.center),
           content: RichText(
+            textAlign: TextAlign.center,
             text: TextSpan(
               style: const TextStyle(
-                fontSize: 16.0,
+                fontSize: 14.0,
                 color: Colors.black,
               ),
               children: <TextSpan>[
-                const TextSpan(text: 'Are you sure you want to remove '),
+                const TextSpan(text: 'Are you sure you want to remove\n '),
                 TextSpan(
                   text: '$showName',
                   style: const TextStyle(
@@ -125,7 +127,7 @@ class FavoritesState extends State<Favorites> {
                     color: Colors.purple,
                   ),
                 ),
-                const TextSpan(text: ' from favorites?'),
+                const TextSpan(text: '\nfrom favorites?'),
               ],
             ),
           ),
@@ -169,15 +171,16 @@ class FavoritesState extends State<Favorites> {
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("Remove to Favorites"),
+          title: const Text("Remove to Favorites", textAlign: TextAlign.center),
           content: RichText(
+            textAlign: TextAlign.center,
             text: TextSpan(
               style: const TextStyle(
                 fontSize: 16.0,
                 color: Colors.black,
               ),
               children: <TextSpan>[
-                const TextSpan(text: 'Are you sure you want to remove '),
+                const TextSpan(text: 'Are you sure you want to remove\n'),
                 TextSpan(
                   text: '$showName',
                   style: const TextStyle(
@@ -185,41 +188,50 @@ class FavoritesState extends State<Favorites> {
                     color: Colors.purple,
                   ),
                 ),
-                const TextSpan(text: ' from favorites?'),
+                const TextSpan(text: '\n from favorites?'),
               ],
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text(
-                'Cancel',
-              ),
-            ),
-            TextButton(
-              onPressed: () async {
-                await SQLHelper.updateFavorite(id, false);
-                setState(() {
-                  favoritesFuture = SQLHelper.getFavorites();
-                });
-                if (slidable == false) {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (context) => MaterialApp(
-                                home: MyApp(
-                              initialIndex: 1,
-                            ))),
-                  );
-                } else {
-                  Navigator.pop(context);
-                }
-              },
-              child: const Text(
-                'Remove',
-                style: TextStyle(color: Colors.red),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      'Cancel',
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: TextButton(
+                    onPressed: () async {
+                      await SQLHelper.updateFavorite(id, false);
+                      setState(() {
+                        favoritesFuture = SQLHelper.getFavorites();
+                      });
+                      if (slidable == false) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => MaterialApp(
+                                      home: MyApp(
+                                    initialIndex: 1,
+                                  ))),
+                        );
+                      } else {
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: const Text(
+                      'Remove',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -253,117 +265,134 @@ class FavoritesState extends State<Favorites> {
           ],
         ),
       ),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final double screenWidth = constraints.maxWidth;
+      body: SingleChildScrollView(
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double screenWidth = constraints.maxWidth;
 
-          if (screenWidth > 600) {
-            // Pantalla grande
-            return Row(
-              children: [
-                Expanded(
-                  child: CachedImage(showData),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 30.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  InkWell(
-                                    child: Text(
-                                      'IMDb: ${showData['imdb']}',
-                                      style: const TextStyle(
-                                        decoration: TextDecoration.underline,
-                                        color: Colors.blue,
-                                      ),
-                                    ),
-                                    onTap: () {
-                                      launch(Uri.parse(
-                                              'https://www.imdb.com/title/${showData['imdb']}')
-                                          .toString());
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Spacer(),
-                            Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Text('Rating: ${showData['rating']}'),
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 12.0),
-                          child: SingleChildScrollView(
-                            child: HtmlWidget(
-                              '<div style="text-align: justify;">${showData['summary']}</div>',
-                              // style: const TextStyle(fontSize: 20.0),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+            if (screenWidth > 600) {
+              // Pantalla grande
+              return Row(
+                children: [
+                  Expanded(
+                    child: CachedImage(showData),
                   ),
-                ),
-              ],
-            );
-          } else {
-            // Pantalla pequeña
-            return SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  CachedImage(showData),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            InkWell(
-                              child: Text(
-                                'IMDb: ${showData['imdb']}',
-                                style: const TextStyle(
-                                  decoration: TextDecoration.underline,
-                                  color: Colors.blue,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 30.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    InkWell(
+                                      child: showData['imdb'].isEmpty
+                                          ? const Text(
+                                              'Dont have IMDBb',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            )
+                                          : Text(
+                                              'IMDb: ${showData['imdb']}',
+                                              style: const TextStyle(
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                color: Colors.blue,
+                                              ),
+                                            ),
+                                      onTap: () {
+                                        launch(Uri.parse(
+                                                'https://www.imdb.com/title/${showData['imdb']}')
+                                            .toString());
+                                      },
+                                    ),
+                                  ],
                                 ),
                               ),
-                              onTap: () {
-                                launch(Uri.parse(
-                                        'https://www.imdb.com/title/${showData['imdb']}')
-                                    .toString());
-                              },
+                              const Spacer(),
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Text('Rating: ${showData['rating']}'),
+                              ),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 12.0),
+                            child: SingleChildScrollView(
+                              child: HtmlWidget(
+                                '<div style="text-align: justify;">${showData['summary']}</div>',
+                                // style: const TextStyle(fontSize: 20.0),
+                              ),
                             ),
-                          ],
-                        ),
-                        const Spacer(),
-                        Text('Rating: ${showData['rating']}'),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: SingleChildScrollView(
-                      child: HtmlWidget(
-                        '<div style="text-align: justify;">${showData['summary']}</div>',
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ],
-              ),
-            );
-          }
-        },
+              );
+            } else {
+              // Pantalla pequeña
+              return SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    CachedImage(showData),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              InkWell(
+                                child: showData['imdb'].isEmpty
+                                    ? const Text(
+                                        'Dont have IMDBb',
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      )
+                                    : Text(
+                                        'IMDb: ${showData['imdb']}',
+                                        style: const TextStyle(
+                                          decoration: TextDecoration.underline,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                onTap: () {
+                                  launch(Uri.parse(
+                                          'https://www.imdb.com/title/${showData['imdb']}')
+                                      .toString());
+                                },
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          Text('Rating: ${showData['rating']}'),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: SingleChildScrollView(
+                        child: HtmlWidget(
+                          '<div style="text-align: justify;">${showData['summary']}</div>',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+          },
+        ),
       ),
     );
   }

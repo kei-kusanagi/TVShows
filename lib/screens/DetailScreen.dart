@@ -94,13 +94,21 @@ class ShowDetailPage extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     InkWell(
-                                      child: Text(
-                                        'IMDb: ${showData['imdb']}',
-                                        style: const TextStyle(
-                                          decoration: TextDecoration.underline,
-                                          color: Colors.blue,
-                                        ),
-                                      ),
+                                      child: showData['imdb'].isEmpty
+                                          ? const Text(
+                                              'Dont have IMDBb',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            )
+                                          : Text(
+                                              'IMDb: ${showData['imdb']}',
+                                              style: const TextStyle(
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                color: Colors.blue,
+                                              ),
+                                            ),
                                       onTap: () {
                                         launch(Uri.parse(
                                                 'https://www.imdb.com/title/${showData['imdb']}')
@@ -141,13 +149,20 @@ class ShowDetailPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               InkWell(
-                                child: Text(
-                                  'IMDb: ${showData['imdb']}',
-                                  style: const TextStyle(
-                                    decoration: TextDecoration.underline,
-                                    color: Colors.blue,
-                                  ),
-                                ),
+                                child: showData['imdb'].isEmpty
+                                    ? const Text(
+                                        'Dont have IMDBb',
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      )
+                                    : Text(
+                                        'IMDb: ${showData['imdb']}',
+                                        style: const TextStyle(
+                                          decoration: TextDecoration.underline,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
                                 onTap: () {
                                   launch(Uri.parse(
                                           'https://www.imdb.com/title/${showData['imdb']}')
