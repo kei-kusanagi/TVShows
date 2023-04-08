@@ -146,8 +146,13 @@ class FavoritesState extends State<Favorites> {
                   favoritesFuture = SQLHelper.getFavorites();
                 });
                 if (slidable == false) {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (context) => MaterialApp(
+                                home: MyApp(
+                              initialIndex: 1,
+                            ))),
+                  );
                 } else {
                   Navigator.pop(context);
                 }
@@ -200,7 +205,6 @@ class FavoritesState extends State<Favorites> {
                   favoritesFuture = SQLHelper.getFavorites();
                 });
                 if (slidable == false) {
-                  Navigator.pop(context);
                   Navigator.of(context).push(
                     MaterialPageRoute(
                         builder: (context) => MaterialApp(
@@ -208,9 +212,6 @@ class FavoritesState extends State<Favorites> {
                               initialIndex: 1,
                             ))),
                   );
-
-                  // Navigator.removeRoute(context, deleteTVshow());
-                  // Navigator.pop(context);
                 } else {
                   Navigator.pop(context);
                 }
