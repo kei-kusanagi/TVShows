@@ -29,29 +29,6 @@ class SQLHelper {
     );
   }
 
-  // static Future<int> createItem(
-  //     int api_id,
-  //     String name,
-  //     String summary,
-  //     String? imageOriginal,
-  //     String? imageMedium,
-  //     String? imdb,
-  //     num? rating) async {
-  //   final db = await SQLHelper.db();
-  //
-  //   final data = {
-  //     'api_id': api_id,
-  //     'name': name,
-  //     'summary': summary,
-  //     'imageOriginal': imageOriginal,
-  //     'imageMedium': imageMedium,
-  //     'imdb': imdb,
-  //     'rating': rating
-  //   };
-  //   final id = await db.insert('items', data,
-  //       conflictAlgorithm: sql.ConflictAlgorithm.replace);
-  //   return id;
-  // }
   static Future<void> createItem(
       int apiId,
       String name,
@@ -72,8 +49,7 @@ class SQLHelper {
         'imageMedium': imageMedium,
         'imdb': imdb,
         'rating': rating,
-        'favorite':
-            favorite, // Valor predeterminado para la columna de favoritos
+        'favorite': favorite,
       },
       conflictAlgorithm: sql.ConflictAlgorithm.replace,
     );
@@ -123,27 +99,6 @@ class SQLHelper {
     }
   }
 
-  // static Future<void> populateDatabase() async {
-  //   final shows = await fetchShows();
-  //
-  //   for (final show in shows) {
-  //     final db = await SQLHelper.db();
-  //     final List<Map<String, dynamic>> maps = await db
-  //         .query('items', where: "api_id = ?", whereArgs: [show.api_id]);
-  //
-  //     if (maps.isEmpty) {
-  //       await SQLHelper.createItem(
-  //         show.api_id,
-  //         show.name,
-  //         show.summary,
-  //         show.imageOriginal,
-  //         show.imageMedium,
-  //         show.imdb,
-  //         show.rating,
-  //       );
-  //     }
-  //   }
-  // }
   static Future<void> populateDatabase() async {
     final shows = await fetchShows();
 
@@ -153,7 +108,6 @@ class SQLHelper {
           .query('items', where: "api_id = ?", whereArgs: [show.api_id]);
 
       final isFavorite = maps.isNotEmpty ? maps[0]['favorite'] == 1 : false;
-      // Verifica si el elemento ya está marcado como favorito en la base de datos local
 
       if (maps.isEmpty) {
         await SQLHelper.createItem(
@@ -164,7 +118,7 @@ class SQLHelper {
           show.imageMedium,
           show.imdb,
           show.rating,
-          0, // Valor predeterminado para la nueva columna de favoritos
+          0,
         );
       } else {
         await SQLHelper.createItem(
@@ -175,9 +129,7 @@ class SQLHelper {
           show.imageMedium,
           show.imdb,
           show.rating,
-          isFavorite
-              ? 1
-              : 0, // Almacena el estado de favoritos en la nueva columna
+          isFavorite ? 1 : 0,
         );
       }
     }

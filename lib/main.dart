@@ -12,15 +12,15 @@ void main() async {
     await SQLHelper.populateDatabase();
     await SQLHelper.setDatabaseCreated();
   }
-  int initialIndex = 0; // aquí puedes definir el índice inicial deseado
+  int initialIndex = 0;
+
   runApp(MyApp(initialIndex: initialIndex));
 }
 
 class MyApp extends StatefulWidget {
-  final int initialIndex; // aquí agregamos una propiedad para el índice inicial
+  final int initialIndex;
 
-  MyApp(
-      {required this.initialIndex}); // aquí definimos el constructor personalizado
+  MyApp({required this.initialIndex});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -32,14 +32,12 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _selectedIndex = widget
-        .initialIndex; // aquí establecemos el índice inicial desde el constructor
+    _selectedIndex = widget.initialIndex;
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       home: SafeArea(
         child: Scaffold(
           body: PageView(
