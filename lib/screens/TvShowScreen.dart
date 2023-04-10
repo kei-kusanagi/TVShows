@@ -30,7 +30,6 @@ class TvShowState extends State<TvShow> {
   Widget build(BuildContext context) {
     _loadData();
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       home: SafeArea(
         child: Scaffold(
           appBar: AppBar(
@@ -53,7 +52,7 @@ class TvShowState extends State<TvShow> {
                             },
                             backgroundColor: Colors.red,
                             foregroundColor: Colors.white,
-                            icon: Icons.delete_outline,
+                            icon: Icons.delete,
                             label: 'Remove from Favorites',
                           )
                         : SlidableAction(
@@ -63,7 +62,7 @@ class TvShowState extends State<TvShow> {
                             },
                             backgroundColor: Colors.green,
                             foregroundColor: Colors.white,
-                            icon: Icons.favorite_border,
+                            icon: Icons.favorite,
                             label: 'Add to Favorites',
                           ),
                   ],

@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:like_button/like_button.dart';
 import 'package:tv_show/main.dart';
 import '../sql/sql_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -30,7 +31,6 @@ class FavoritesState extends State<Favorites> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       home: SafeArea(
         child: Scaffold(
           appBar: AppBar(
@@ -71,14 +71,6 @@ class FavoritesState extends State<Favorites> {
                             builder: (context) => _showDetail(favorite),
                           ));
                         },
-
-                        // onTap: () {
-                        //   Navigator.of(context)
-                        //       .pushReplacement(MaterialPageRoute(
-                        //     builder: (context) => _showDetail(favorite),
-                        //   ));
-                        // },
-
                         title: Text(favorite['name']),
                         leading: CachedImage(favorite),
                         trailing: const Icon(Icons.arrow_forward_ios_rounded,
@@ -214,6 +206,7 @@ class FavoritesState extends State<Favorites> {
                         favoritesFuture = SQLHelper.getFavorites();
                       });
                       if (slidable == false) {
+                        Navigator.pop(context);
                         Navigator.of(context).push(
                           MaterialPageRoute(
                               builder: (context) => MaterialApp(
@@ -240,158 +233,180 @@ class FavoritesState extends State<Favorites> {
   }
 
   _showDetail(Map<String, dynamic> showData) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () {
-              deleteTVshow(context, showData['id'], showData['name'], false);
-            },
-          )
-        ],
-        backgroundColor: Colors.orangeAccent,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Favorites',
-              style: TextStyle(fontSize: 16),
-            ),
-            Text(
-              showData['name'],
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: LikeButton(
+                bubblesSize: 75,
+                animationDuration: const Duration(milliseconds: 1500),
+                bubblesColor: const BubblesColor(
+                  dotPrimaryColor: Colors.red,
+                  dotSecondaryColor: Colors.white,
+                ),
+                likeBuilder: (isTapped) {
+                  return Icon(
+                    Icons.delete,
+                    color: Colors.red[800],
+                    size: 30,
+                  );
+                },
+                onTap: (isLiked) async {
+                  await deleteTVshow(
+                      context, showData['id'], showData['name'], false);
+                  return true;
+                },
+              ),
             ),
           ],
+          backgroundColor: Colors.orangeAccent,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Favorites',
+                style: TextStyle(fontSize: 16),
+              ),
+              Text(
+                showData['name'],
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            final double screenWidth = constraints.maxWidth;
+        body: SingleChildScrollView(
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final double screenWidth = constraints.maxWidth;
 
-            if (screenWidth > 600) {
-              // Pantalla grande
-              return Row(
-                children: [
-                  Expanded(
-                    child: CachedImage(showData),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 30.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    InkWell(
-                                      child: showData['imdb'].isEmpty
-                                          ? const Text(
-                                              'Dont have IMDBb',
-                                              style: TextStyle(
-                                                color: Colors.red,
+              if (screenWidth > 600) {
+                // Pantalla grande
+                return Row(
+                  children: [
+                    Expanded(
+                      child: CachedImage(showData),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 30.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      InkWell(
+                                        child: showData['imdb'].isEmpty
+                                            ? const Text(
+                                                'Dont have IMDBb',
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                ),
+                                              )
+                                            : Text(
+                                                'IMDb: ${showData['imdb']}',
+                                                style: const TextStyle(
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                  color: Colors.blue,
+                                                ),
                                               ),
-                                            )
-                                          : Text(
-                                              'IMDb: ${showData['imdb']}',
-                                              style: const TextStyle(
-                                                decoration:
-                                                    TextDecoration.underline,
-                                                color: Colors.blue,
-                                              ),
-                                            ),
-                                      onTap: () {
-                                        launch(Uri.parse(
-                                                'https://www.imdb.com/title/${showData['imdb']}')
-                                            .toString());
-                                      },
-                                    ),
-                                  ],
+                                        onTap: () {
+                                          launch(Uri.parse(
+                                                  'https://www.imdb.com/title/${showData['imdb']}')
+                                              .toString());
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Spacer(),
+                                Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Text('Rating: ${showData['rating']}'),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 12.0),
+                              child: SingleChildScrollView(
+                                child: HtmlWidget(
+                                  '<div style="text-align: justify;">${showData['summary']}</div>',
+                                  // style: const TextStyle(fontSize: 20.0),
                                 ),
                               ),
-                              const Spacer(),
-                              Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Text('Rating: ${showData['rating']}'),
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 12.0),
-                            child: SingleChildScrollView(
-                              child: HtmlWidget(
-                                '<div style="text-align: justify;">${showData['summary']}</div>',
-                                // style: const TextStyle(fontSize: 20.0),
-                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            } else {
-              // Pantalla pequeña
-              return SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    CachedImage(showData),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              InkWell(
-                                child: showData['imdb'].isEmpty
-                                    ? const Text(
-                                        'Dont have IMDBb',
-                                        style: TextStyle(
-                                          color: Colors.red,
-                                        ),
-                                      )
-                                    : Text(
-                                        'IMDb: ${showData['imdb']}',
-                                        style: const TextStyle(
-                                          decoration: TextDecoration.underline,
-                                          color: Colors.blue,
-                                        ),
-                                      ),
-                                onTap: () {
-                                  launch(Uri.parse(
-                                          'https://www.imdb.com/title/${showData['imdb']}')
-                                      .toString());
-                                },
-                              ),
-                            ],
-                          ),
-                          const Spacer(),
-                          Text('Rating: ${showData['rating']}'),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: SingleChildScrollView(
-                        child: HtmlWidget(
-                          '<div style="text-align: justify;">${showData['summary']}</div>',
+                          ],
                         ),
                       ),
                     ),
                   ],
-                ),
-              );
-            }
-          },
+                );
+              } else {
+                // Pantalla pequeña
+                return SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      CachedImage(showData),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                InkWell(
+                                  child: showData['imdb'].isEmpty
+                                      ? const Text(
+                                          'Dont have IMDBb',
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                          ),
+                                        )
+                                      : Text(
+                                          'IMDb: ${showData['imdb']}',
+                                          style: const TextStyle(
+                                            decoration:
+                                                TextDecoration.underline,
+                                            color: Colors.blue,
+                                          ),
+                                        ),
+                                  onTap: () {
+                                    launch(Uri.parse(
+                                            'https://www.imdb.com/title/${showData['imdb']}')
+                                        .toString());
+                                  },
+                                ),
+                              ],
+                            ),
+                            const Spacer(),
+                            Text('Rating: ${showData['rating']}'),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: SingleChildScrollView(
+                          child: HtmlWidget(
+                            '<div style="text-align: justify;">${showData['summary']}</div>',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
+          ),
         ),
       ),
     );
