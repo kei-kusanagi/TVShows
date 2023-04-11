@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -28,15 +26,14 @@ class FavoritesState extends State<Favorites> {
     favoritesFuture = SQLHelper.getFavorites();
   }
 
+  // final GlobalVariables globalVariables = GlobalVariables();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      darkTheme: ThemeData.dark(),
+      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       home: SafeArea(
         child: Scaffold(
-          appBar: AppBar(
-            title: const Center(child: Text('Favorites')),
-            backgroundColor: Colors.purple,
-          ),
           body: FutureBuilder<List<Map<String, dynamic>>>(
             future: favoritesFuture,
             builder: (BuildContext context,
@@ -66,10 +63,16 @@ class FavoritesState extends State<Favorites> {
                         ],
                       ),
                       child: ListTile(
+                        // onTap: () {
+                        //   Navigator.of(context).push(MaterialPageRoute(
+                        //     builder: (context) => _showDetail(favorite),
+                        //   ));
+                        // },
                         onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => _showDetail(favorite),
-                          ));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => _showDetail(favorite)));
                         },
                         title: Text(favorite['name']),
                         leading: CachedImage(favorite),
@@ -103,25 +106,26 @@ class FavoritesState extends State<Favorites> {
         builder: (context) => CupertinoAlertDialog(
           title:
               const Text("Remove to Favorites\n", textAlign: TextAlign.center),
-          content: RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              style: const TextStyle(
-                fontSize: 14.0,
-                color: Colors.black,
-              ),
-              children: <TextSpan>[
-                const TextSpan(text: 'Are you sure you want to remove\n '),
-                TextSpan(
-                  text: '$showName',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.purple,
-                  ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text('Are you sure you want to remove\n'),
+              RichText(
+                text: TextSpan(
+                  style: DefaultTextStyle.of(context).style,
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: '$showName',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.purpleAccent),
+                    ),
+                  ],
                 ),
-                const TextSpan(text: '\nfrom favorites?'),
-              ],
-            ),
+              ),
+              const Text('\n from favorites?'),
+            ],
           ),
           actions: [
             CupertinoDialogAction(
@@ -164,25 +168,26 @@ class FavoritesState extends State<Favorites> {
         context: context,
         builder: (context) => AlertDialog(
           title: const Text("Remove to Favorites", textAlign: TextAlign.center),
-          content: RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              style: const TextStyle(
-                fontSize: 16.0,
-                color: Colors.black,
-              ),
-              children: <TextSpan>[
-                const TextSpan(text: 'Are you sure you want to remove\n'),
-                TextSpan(
-                  text: '$showName',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.purple,
-                  ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text('Are you sure you want to remove\n'),
+              RichText(
+                text: TextSpan(
+                  style: DefaultTextStyle.of(context).style,
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: '$showName',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.purpleAccent),
+                    ),
+                  ],
                 ),
-                const TextSpan(text: '\n from favorites?'),
-              ],
-            ),
+              ),
+              const Text('\n from favorites?'),
+            ],
           ),
           actions: [
             Row(
@@ -235,48 +240,7 @@ class FavoritesState extends State<Favorites> {
   _showDetail(Map<String, dynamic> showData) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          actions: [
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: LikeButton(
-                bubblesSize: 75,
-                animationDuration: const Duration(milliseconds: 1500),
-                bubblesColor: const BubblesColor(
-                  dotPrimaryColor: Colors.red,
-                  dotSecondaryColor: Colors.white,
-                ),
-                likeBuilder: (isTapped) {
-                  return Icon(
-                    Icons.delete,
-                    color: Colors.red[800],
-                    size: 30,
-                  );
-                },
-                onTap: (isLiked) async {
-                  await deleteTVshow(
-                      context, showData['id'], showData['name'], false);
-                  return true;
-                },
-              ),
-            ),
-          ],
-          backgroundColor: Colors.orangeAccent,
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Favorites',
-                style: TextStyle(fontSize: 16),
-              ),
-              Text(
-                showData['name'],
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        ),
+        appBar: FavoriteAppBar(showData),
         body: SingleChildScrollView(
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
@@ -408,6 +372,50 @@ class FavoritesState extends State<Favorites> {
             },
           ),
         ),
+      ),
+    );
+  }
+
+  AppBar FavoriteAppBar(Map<String, dynamic> showData) {
+    return AppBar(
+      actions: [
+        Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: LikeButton(
+            bubblesSize: 75,
+            animationDuration: const Duration(milliseconds: 1500),
+            bubblesColor: const BubblesColor(
+              dotPrimaryColor: Colors.red,
+              dotSecondaryColor: Colors.white,
+            ),
+            likeBuilder: (isTapped) {
+              return Icon(
+                Icons.delete,
+                color: Colors.red[800],
+                size: 30,
+              );
+            },
+            onTap: (isLiked) async {
+              await deleteTVshow(
+                  context, showData['id'], showData['name'], false);
+              return true;
+            },
+          ),
+        ),
+      ],
+      backgroundColor: Colors.orangeAccent,
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Favorites',
+            style: TextStyle(fontSize: 16),
+          ),
+          Text(
+            showData['name'],
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }

@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -19,73 +17,7 @@ class ShowDetailPage extends StatelessWidget {
 
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          actions: [
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: LikeButton(
-                bubblesSize: 75,
-                animationDuration: const Duration(milliseconds: 1500),
-                bubblesColor: isFavorite
-                    ? const BubblesColor(
-                        dotPrimaryColor: Colors.purpleAccent,
-                        dotSecondaryColor: Colors.greenAccent)
-                    : const BubblesColor(
-                        dotPrimaryColor: Colors.white,
-                        dotSecondaryColor: Colors.redAccent,
-                      ),
-                likeBuilder: (isTapped) {
-                  return isFavorite
-                      ? const Icon(
-                          Icons.favorite,
-                          color: Colors.purple,
-                          size: 30,
-                        )
-                      : const Icon(
-                          size: 30,
-                          Icons.favorite_border,
-                        );
-                },
-                onTap: (isLiked) async {
-                  if (isFavorite) {
-                    SQLHelper.updateFavorite(showData['id'], false);
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Removed to Favorites'),
-                          duration: Duration(seconds: 1)),
-                    );
-                  } else {
-                    SQLHelper.updateFavorite(showData['id'], true);
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Added to Favorites',
-                              textAlign: TextAlign.right),
-                          duration: Duration(seconds: 1)),
-                    );
-                  }
-                  return !isLiked;
-                },
-              ),
-            ),
-          ],
-          backgroundColor: Colors.orangeAccent,
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'TV Shows',
-                style: TextStyle(fontSize: 16),
-              ),
-              Text(
-                showData['name'],
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        ),
+        appBar: DetailScreenAppBar(isFavorite, context),
         body: SingleChildScrollView(
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
@@ -211,7 +143,75 @@ class ShowDetailPage extends StatelessWidget {
             },
           ),
         ),
-        bottomNavigationBar: null,
+      ),
+    );
+  }
+
+  AppBar DetailScreenAppBar(bool isFavorite, BuildContext context) {
+    return AppBar(
+      actions: [
+        Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: LikeButton(
+            bubblesSize: 75,
+            animationDuration: const Duration(milliseconds: 1500),
+            bubblesColor: isFavorite
+                ? const BubblesColor(
+                    dotPrimaryColor: Colors.purpleAccent,
+                    dotSecondaryColor: Colors.greenAccent)
+                : const BubblesColor(
+                    dotPrimaryColor: Colors.white,
+                    dotSecondaryColor: Colors.redAccent,
+                  ),
+            likeBuilder: (isTapped) {
+              return isFavorite
+                  ? const Icon(
+                      Icons.favorite,
+                      color: Colors.purple,
+                      size: 30,
+                    )
+                  : const Icon(
+                      size: 30,
+                      Icons.favorite_border,
+                    );
+            },
+            onTap: (isLiked) async {
+              if (isFavorite) {
+                SQLHelper.updateFavorite(showData['id'], false);
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Removed to Favorites'),
+                      duration: Duration(seconds: 1)),
+                );
+              } else {
+                SQLHelper.updateFavorite(showData['id'], true);
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Added to Favorites',
+                          textAlign: TextAlign.right),
+                      duration: Duration(seconds: 1)),
+                );
+              }
+              return !isLiked;
+            },
+          ),
+        ),
+      ],
+      backgroundColor: Colors.orangeAccent,
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'TV Shows',
+            style: TextStyle(fontSize: 16),
+          ),
+          Text(
+            showData['name'],
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }

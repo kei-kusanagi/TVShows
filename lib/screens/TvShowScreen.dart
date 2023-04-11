@@ -3,6 +3,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:tv_show/screens/DetailScreen.dart';
 import 'package:tv_show/sql/sql_helper.dart';
+import 'package:tv_show/main.dart';
 
 class TvShow extends StatefulWidget {
   @override
@@ -30,12 +31,10 @@ class TvShowState extends State<TvShow> {
   Widget build(BuildContext context) {
     _loadData();
     return MaterialApp(
+      darkTheme: ThemeData.dark(),
+      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       home: SafeArea(
         child: Scaffold(
-          appBar: AppBar(
-            title: const Center(child: Text("TV Shows")),
-            backgroundColor: Colors.purple,
-          ),
           body: ListView.builder(
             itemCount: _tvShows.length,
             itemBuilder: (context, index) {
@@ -68,19 +67,29 @@ class TvShowState extends State<TvShow> {
                   ],
                 ),
                 child: ListTile(
+                  // onTap: () {
+                  //   Navigator.of(context).push(MaterialPageRoute(
+                  //     builder: (context) =>
+                  //         ShowDetailPage(showData: _tvShows[index]),
+                  //   ));
+                  //
+                  // },
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          ShowDetailPage(showData: _tvShows[index]),
-                    ));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              ShowDetailPage(showData: _tvShows[index])),
+                    );
                   },
                   title: Text(_tvShows[index]['name']),
                   // leading: Image.network(_tvShows[index]['imageMedium']),
                   leading: CachedNetworkImage(
                     imageUrl: _tvShows[index]['imageMedium'],
-                    placeholder: (context, url) => CircularProgressIndicator(),
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
                     errorWidget: (context, url, error) =>
-                        Icon(Icons.network_check_outlined),
+                        const Icon(Icons.network_check_outlined),
                   ),
 
                   trailing: const Icon(Icons.arrow_forward_ios_rounded,
