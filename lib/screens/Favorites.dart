@@ -65,11 +65,6 @@ class FavoritesState extends State<Favorites> {
                         ],
                       ),
                       child: ListTile(
-                        // onTap: () {
-                        //   Navigator.of(context).push(MaterialPageRoute(
-                        //     builder: (context) => _showDetail(favorite),
-                        //   ));
-                        // },
                         onTap: () {
                           Provider.of<ScreenModel>(context, listen: false)
                               .isFullScreen = true;
@@ -145,6 +140,8 @@ class FavoritesState extends State<Favorites> {
               onPressed: () async {
                 await SQLHelper.updateFavorite(id, false);
                 setState(() {
+                  Provider.of<ScreenModel>(context, listen: false)
+                      .isFullScreen = false;
                   favoritesFuture = SQLHelper.getFavorites();
                 });
                 if (slidable == false) {
@@ -218,10 +215,12 @@ class FavoritesState extends State<Favorites> {
                         Navigator.pop(context);
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                              builder: (context) => MaterialApp(
-                                      home: MyApp(
-                                    initialIndex: 1,
-                                  ))),
+                            builder: (context) => MaterialApp(
+                              home: MyApp(
+                                initialIndex: 1,
+                              ),
+                            ),
+                          ),
                         );
                       } else {
                         Navigator.pop(context);
@@ -416,10 +415,12 @@ class FavoritesState extends State<Favorites> {
           Provider.of<ScreenModel>(context, listen: false).isFullScreen = false;
           Navigator.of(context).push(
             MaterialPageRoute(
-                builder: (context) => MaterialApp(
-                        home: MyApp(
-                      initialIndex: 1,
-                    ))),
+              builder: (context) => MaterialApp(
+                home: MyApp(
+                  initialIndex: 1,
+                ),
+              ),
+            ),
           );
         },
       ),
@@ -446,30 +447,6 @@ class FavoritesState extends State<Favorites> {
       placeholder: (context, url) => const CircularProgressIndicator(),
       errorWidget: (context, url, error) =>
           const Icon(Icons.network_check_outlined),
-    );
-  }
-
-  AppBar MainAppBar() {
-    return AppBar(
-      title: const Center(
-        child: Text('Favorites'),
-      ),
-      backgroundColor: Colors.purple,
-      actions: [
-        IconButton(
-          icon: isDark ? Icon(Icons.sunny) : Icon(Icons.nights_stay),
-          onPressed: () {
-            setState(() {
-              MyApp(
-                initialIndex: 1,
-              ).toggleDarkMode();
-            });
-          },
-          // onPressed: () => toggleDarkMode(),
-        ),
-      ],
-      // forceMaterialTransparency: true,
-      // automaticallyImplyLeading: false,
     );
   }
 }

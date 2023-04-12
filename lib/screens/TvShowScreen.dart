@@ -78,15 +78,6 @@ class TvShowState extends State<TvShow> {
                           ShowDetailPage(showData: _tvShows[index]),
                     ));
                   },
-                  // onTap: () {
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (context) =>
-                  //             ShowDetailPage(showData: _tvShows[index])),
-                  //   );
-                  // },
-
                   title: Text(_tvShows[index]['name']),
                   leading: CachedNetworkImage(
                     imageUrl: _tvShows[index]['imageMedium'],
@@ -95,7 +86,6 @@ class TvShowState extends State<TvShow> {
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.network_check_outlined),
                   ),
-
                   trailing: const Icon(Icons.arrow_forward_ios_rounded,
                       color: Colors.grey),
                 ),
@@ -104,27 +94,6 @@ class TvShowState extends State<TvShow> {
           ),
         ),
       ),
-    );
-  }
-
-  AppBar MainAppBar() {
-    return AppBar(
-      title: const Center(
-        child: Text('Tv Shows'),
-      ),
-      backgroundColor: Colors.purple,
-      actions: [
-        IconButton(
-          icon: isDark ? Icon(Icons.sunny) : Icon(Icons.nights_stay),
-          onPressed: () {
-            setState(() {
-              MyApp(
-                initialIndex: 0,
-              ).toggleDarkMode();
-            });
-          },
-        ),
-      ],
     );
   }
 }
