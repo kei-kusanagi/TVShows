@@ -2,14 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:tv_show/screens/Favorites.dart';
 import 'package:tv_show/sql/sql_helper.dart';
 import 'screens/TvShowScreen.dart';
-import 'package:tv_show/screens/DetailScreen.dart';
+import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
+
+class ScreenModel extends ChangeNotifier {
+  bool _isFullScreen = false;
+
+  bool get isFullScreen => _isFullScreen;
+
+  set isFullScreen(bool value) {
+    _isFullScreen = value;
+    notifyListeners();
+  }
+}
 
 bool _isDark = false;
 get isDark => _isDark;
-
-void toggleDarkMode() {
-  _isDark = !_isDark;
-}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,10 +30,19 @@ void main() async {
   }
   int initialIndex = 0;
 
-  runApp(MyApp(initialIndex: initialIndex));
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ScreenModel(),
+      child: MyApp(initialIndex: initialIndex),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
+  void toggleDarkMode() {
+    _isDark = !_isDark;
+  }
+
   final int initialIndex;
 
   MyApp({required this.initialIndex});
@@ -49,54 +66,47 @@ class _MyAppState extends State<MyApp> {
       darkTheme: ThemeData.dark(),
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       home: SafeArea(
-        child: Scaffold(
-          // appBar: MainAppBar(),
-          appBar: AppBar(
-            title: Center(
-              child: Text(_selectedIndex == 0 ? 'Tv Shows' : 'Favorites'),
+        child: Consumer<ScreenModel>(builder: (context, screenModel, child) {
+          return Scaffold(
+            extendBodyBehindAppBar: true,
+            appBar: Provider.of<ScreenModel>(context).isFullScreen
+                ? null
+                : MainAppbar(),
+            // MainAppbar(),
+            body: PageView(
+              physics: BouncingScrollPhysics(),
+              children: <Widget>[
+                _selectedIndex == 0 ? TvShow() : Favorites(),
+              ],
             ),
-            backgroundColor: Colors.purple,
-            actions: [
-              IconButton(
-                icon: isDark ? Icon(Icons.sunny) : Icon(Icons.nights_stay),
-                onPressed: () {
-                  setState(() {
-                    toggleDarkMode();
-                  });
-                },
-                // onPressed: () => toggleDarkMode(),
-              ),
-            ],
-          ),
-          body: PageView(
-            physics: BouncingScrollPhysics(),
-            children: <Widget>[
-              _selectedIndex == 0 ? TvShow() : Favorites(),
-            ],
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.live_tv_outlined),
-                label: 'TV Shows',
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.favorite), label: 'Favorites'),
-            ],
-            currentIndex: _selectedIndex,
-            selectedItemColor: Colors.purple[800],
-            onTap: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-          ),
-        ),
+            bottomNavigationBar: BottomNavigationBar(
+              // backgroundColor: Colors.grey,
+              // unselectedItemColor: Colors.white,
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.live_tv_outlined),
+                  label: 'TV Shows',
+                ),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.favorite), label: 'Favorites'),
+              ],
+              currentIndex: _selectedIndex,
+              selectedItemColor: Colors.purple[800],
+              onTap: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                  Provider.of<ScreenModel>(context, listen: false)
+                      .isFullScreen = false;
+                });
+              },
+            ),
+          );
+        }),
       ),
     );
   }
 
-  AppBar MainAppBar() {
+  AppBar MainAppbar() {
     return AppBar(
       title: Center(
         child: Text(_selectedIndex == 0 ? 'Tv Shows' : 'Favorites'),
@@ -107,81 +117,13 @@ class _MyAppState extends State<MyApp> {
           icon: isDark ? Icon(Icons.sunny) : Icon(Icons.nights_stay),
           onPressed: () {
             setState(() {
-              toggleDarkMode();
+              MyApp(
+                initialIndex: _selectedIndex,
+              ).toggleDarkMode();
             });
           },
-          // onPressed: () => toggleDarkMode(),
         ),
       ],
     );
   }
 }
-
-// AppBar DetailScreenAppBar(bool isFavorite, BuildContext context) {
-//   return AppBar(
-//     actions: [
-//       Padding(
-//         padding: const EdgeInsets.all(15.0),
-//         child: LikeButton(
-//           bubblesSize: 75,
-//           animationDuration: const Duration(milliseconds: 1500),
-//           bubblesColor: isFavorite
-//               ? const BubblesColor(
-//               dotPrimaryColor: Colors.purpleAccent,
-//               dotSecondaryColor: Colors.greenAccent)
-//               : const BubblesColor(
-//             dotPrimaryColor: Colors.white,
-//             dotSecondaryColor: Colors.redAccent,
-//           ),
-//           likeBuilder: (isTapped) {
-//             return isFavorite
-//                 ? const Icon(
-//               Icons.favorite,
-//               color: Colors.purple,
-//               size: 30,
-//             )
-//                 : const Icon(
-//               size: 30,
-//               Icons.favorite_border,
-//             );
-//           },
-//           onTap: (isLiked) async {
-//             if (isFavorite) {
-//               SQLHelper.updateFavorite(showData['id'], false);
-//               ScaffoldMessenger.of(context).hideCurrentSnackBar();
-//               ScaffoldMessenger.of(context).showSnackBar(
-//                 const SnackBar(
-//                     content: Text('Removed to Favorites'),
-//                     duration: Duration(seconds: 1)),
-//               );
-//             } else {
-//               SQLHelper.updateFavorite(showData['id'], true);
-//               ScaffoldMessenger.of(context).hideCurrentSnackBar();
-//               ScaffoldMessenger.of(context).showSnackBar(
-//                 const SnackBar(
-//                     content: Text('Added to Favorites',
-//                         textAlign: TextAlign.right),
-//                     duration: Duration(seconds: 1)),
-//               );
-//             }
-//             return !isLiked;
-//           },
-//         ),
-//       ),
-//     ],
-//     backgroundColor: Colors.orangeAccent,
-//     title: Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         const Text(
-//           'TV Shows',
-//           style: TextStyle(fontSize: 16),
-//         ),
-//         Text(
-//           showData['name'],
-//           style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-//         ),
-//       ],
-//     ),
-//   );
-// }

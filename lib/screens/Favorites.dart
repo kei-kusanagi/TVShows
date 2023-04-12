@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:like_button/like_button.dart';
+import 'package:provider/provider.dart';
 import 'package:tv_show/main.dart';
 import '../sql/sql_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -34,6 +35,7 @@ class FavoritesState extends State<Favorites> {
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       home: SafeArea(
         child: Scaffold(
+          // appBar: MainAppBar(),
           body: FutureBuilder<List<Map<String, dynamic>>>(
             future: favoritesFuture,
             builder: (BuildContext context,
@@ -69,6 +71,8 @@ class FavoritesState extends State<Favorites> {
                         //   ));
                         // },
                         onTap: () {
+                          Provider.of<ScreenModel>(context, listen: false)
+                              .isFullScreen = true;
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -398,12 +402,27 @@ class FavoritesState extends State<Favorites> {
             onTap: (isLiked) async {
               await deleteTVshow(
                   context, showData['id'], showData['name'], false);
+              Provider.of<ScreenModel>(context, listen: false).isFullScreen =
+                  false;
               return true;
             },
           ),
         ),
       ],
       backgroundColor: Colors.orangeAccent,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          Provider.of<ScreenModel>(context, listen: false).isFullScreen = false;
+          Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (context) => MaterialApp(
+                        home: MyApp(
+                      initialIndex: 1,
+                    ))),
+          );
+        },
+      ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -427,6 +446,30 @@ class FavoritesState extends State<Favorites> {
       placeholder: (context, url) => const CircularProgressIndicator(),
       errorWidget: (context, url, error) =>
           const Icon(Icons.network_check_outlined),
+    );
+  }
+
+  AppBar MainAppBar() {
+    return AppBar(
+      title: const Center(
+        child: Text('Favorites'),
+      ),
+      backgroundColor: Colors.purple,
+      actions: [
+        IconButton(
+          icon: isDark ? Icon(Icons.sunny) : Icon(Icons.nights_stay),
+          onPressed: () {
+            setState(() {
+              MyApp(
+                initialIndex: 1,
+              ).toggleDarkMode();
+            });
+          },
+          // onPressed: () => toggleDarkMode(),
+        ),
+      ],
+      // forceMaterialTransparency: true,
+      // automaticallyImplyLeading: false,
     );
   }
 }

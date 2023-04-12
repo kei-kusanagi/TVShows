@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tv_show/screens/DetailScreen.dart';
 import 'package:tv_show/sql/sql_helper.dart';
 import 'package:tv_show/main.dart';
@@ -35,6 +36,7 @@ class TvShowState extends State<TvShow> {
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       home: SafeArea(
         child: Scaffold(
+          // appBar: MainAppBar(),
           body: ListView.builder(
             itemCount: _tvShows.length,
             itemBuilder: (context, index) {
@@ -67,23 +69,25 @@ class TvShowState extends State<TvShow> {
                   ],
                 ),
                 child: ListTile(
-                  // onTap: () {
-                  //   Navigator.of(context).push(MaterialPageRoute(
-                  //     builder: (context) =>
-                  //         ShowDetailPage(showData: _tvShows[index]),
-                  //   ));
-                  //
-                  // },
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              ShowDetailPage(showData: _tvShows[index])),
-                    );
+                    Provider.of<ScreenModel>(context, listen: false)
+                        .isFullScreen = true;
+                    Navigator.of(context).push(MaterialPageRoute(
+                      // fullscreenDialog: true,
+                      builder: (BuildContext detail) =>
+                          ShowDetailPage(showData: _tvShows[index]),
+                    ));
                   },
+                  // onTap: () {
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //         builder: (context) =>
+                  //             ShowDetailPage(showData: _tvShows[index])),
+                  //   );
+                  // },
+
                   title: Text(_tvShows[index]['name']),
-                  // leading: Image.network(_tvShows[index]['imageMedium']),
                   leading: CachedNetworkImage(
                     imageUrl: _tvShows[index]['imageMedium'],
                     placeholder: (context, url) =>
@@ -100,6 +104,27 @@ class TvShowState extends State<TvShow> {
           ),
         ),
       ),
+    );
+  }
+
+  AppBar MainAppBar() {
+    return AppBar(
+      title: const Center(
+        child: Text('Tv Shows'),
+      ),
+      backgroundColor: Colors.purple,
+      actions: [
+        IconButton(
+          icon: isDark ? Icon(Icons.sunny) : Icon(Icons.nights_stay),
+          onPressed: () {
+            setState(() {
+              MyApp(
+                initialIndex: 0,
+              ).toggleDarkMode();
+            });
+          },
+        ),
+      ],
     );
   }
 }

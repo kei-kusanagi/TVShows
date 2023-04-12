@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:provider/provider.dart';
+import 'package:tv_show/main.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:like_button/like_button.dart';
 
@@ -15,133 +17,129 @@ class ShowDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isFavorite = showData['favorite'] == 1;
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: DetailScreenAppBar(isFavorite, context),
-        body: SingleChildScrollView(
-          child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              final double screenWidth = constraints.maxWidth;
+    return Scaffold(
+      appBar: DetailScreenAppBar(isFavorite, context),
+      body: SingleChildScrollView(
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double screenWidth = constraints.maxWidth;
 
-              if (screenWidth > 600) {
-                // Pantalla grande
-                return Row(
-                  children: [
-                    Expanded(
-                      child: CachedImage(),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 30.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      InkWell(
-                                        child: showData['imdb'].isEmpty
-                                            ? const Text(
-                                                'Dont have IMDBb',
-                                                style: TextStyle(
-                                                  color: Colors.red,
-                                                ),
-                                              )
-                                            : Text(
-                                                'IMDb: ${showData['imdb']}',
-                                                style: const TextStyle(
-                                                  decoration:
-                                                      TextDecoration.underline,
-                                                  color: Colors.blue,
-                                                ),
+            if (screenWidth > 600) {
+              // Pantalla grande
+              return Row(
+                children: [
+                  Expanded(
+                    child: CachedImage(),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 30.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    InkWell(
+                                      child: showData['imdb'].isEmpty
+                                          ? const Text(
+                                              'Dont have IMDBb',
+                                              style: TextStyle(
+                                                color: Colors.red,
                                               ),
-                                        onTap: () {
-                                          launch(Uri.parse(
-                                                  'https://www.imdb.com/title/${showData['imdb']}')
-                                              .toString());
-                                        },
+                                            )
+                                          : Text(
+                                              'IMDb: ${showData['imdb']}',
+                                              style: const TextStyle(
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                color: Colors.blue,
+                                              ),
+                                            ),
+                                      onTap: () {
+                                        launch(Uri.parse(
+                                                'https://www.imdb.com/title/${showData['imdb']}')
+                                            .toString());
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Spacer(),
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Text('Rating: ${showData['rating']}'),
+                              ),
+                            ],
+                          ),
+                          HtmlWidget(
+                            '<div style="text-align: justify;">${showData['summary']}</div>',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              // Pantalla pequeña
+              return SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    CachedImage(),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              InkWell(
+                                child: showData['imdb'].isEmpty
+                                    ? const Text(
+                                        'Dont have IMDBb',
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      )
+                                    : Text(
+                                        'IMDb: ${showData['imdb']}',
+                                        style: const TextStyle(
+                                          decoration: TextDecoration.underline,
+                                          color: Colors.blue,
+                                        ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                                const Spacer(),
-                                Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Text('Rating: ${showData['rating']}'),
-                                ),
-                              ],
-                            ),
-                            HtmlWidget(
-                              '<div style="text-align: justify;">${showData['summary']}</div>',
-                            ),
-                          ],
+                                onTap: () {
+                                  launch(Uri.parse(
+                                          'https://www.imdb.com/title/${showData['imdb']}')
+                                      .toString());
+                                },
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          Text('Rating: ${showData['rating']}'),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: SingleChildScrollView(
+                        child: HtmlWidget(
+                          '<div style="text-align: justify;">${showData['summary']}</div>',
                         ),
                       ),
                     ),
                   ],
-                );
-              } else {
-                // Pantalla pequeña
-                return SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      CachedImage(),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                InkWell(
-                                  child: showData['imdb'].isEmpty
-                                      ? const Text(
-                                          'Dont have IMDBb',
-                                          style: TextStyle(
-                                            color: Colors.red,
-                                          ),
-                                        )
-                                      : Text(
-                                          'IMDb: ${showData['imdb']}',
-                                          style: const TextStyle(
-                                            decoration:
-                                                TextDecoration.underline,
-                                            color: Colors.blue,
-                                          ),
-                                        ),
-                                  onTap: () {
-                                    launch(Uri.parse(
-                                            'https://www.imdb.com/title/${showData['imdb']}')
-                                        .toString());
-                                  },
-                                ),
-                              ],
-                            ),
-                            const Spacer(),
-                            Text('Rating: ${showData['rating']}'),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: SingleChildScrollView(
-                          child: HtmlWidget(
-                            '<div style="text-align: justify;">${showData['summary']}</div>',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-            },
-          ),
+                ),
+              );
+            }
+          },
         ),
       ),
     );
@@ -200,6 +198,13 @@ class ShowDetailPage extends StatelessWidget {
         ),
       ],
       backgroundColor: Colors.orangeAccent,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          Provider.of<ScreenModel>(context, listen: false).isFullScreen = false;
+          Navigator.of(context).pop();
+        },
+      ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
