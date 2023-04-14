@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:tv_show/screens/Favorites.dart';
 import 'package:tv_show/sql/sql_helper.dart';
 import 'screens/TvShowScreen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_color/flutter_color.dart';
 
 class ScreenModel extends ChangeNotifier {
   bool _isFullScreen = false;
@@ -12,6 +14,14 @@ class ScreenModel extends ChangeNotifier {
 
   set isFullScreen(bool value) {
     _isFullScreen = value;
+    notifyListeners();
+  }
+
+  Color _colorTheme = Colors.purple;
+  Color get colorTheme => _colorTheme;
+
+  set colorTheme(Color newColor) {
+    _colorTheme = newColor;
     notifyListeners();
   }
 }
@@ -62,17 +72,87 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    Color pickerColor =
+        Provider.of<ScreenModel>(context, listen: false).colorTheme;
+    Color currentColor =
+        Provider.of<ScreenModel>(context, listen: false).colorTheme;
+
+    void changeColor(Color color) {
+      setState(() => pickerColor = color);
+    }
+
+    final Color colorProvider = Provider.of<ScreenModel>(context).colorTheme;
+    Color colorBackGround = Provider.of<ScreenModel>(context).colorTheme;
     return MaterialApp(
       darkTheme: ThemeData.dark(),
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+      theme: ThemeData.from(
+        colorScheme: ColorScheme.fromSeed(seedColor: colorProvider),
+      ),
       home: SafeArea(
         child: Consumer<ScreenModel>(builder: (context, screenModel, child) {
           return Scaffold(
             extendBodyBehindAppBar: true,
-            appBar: Provider.of<ScreenModel>(context).isFullScreen
-                ? null
-                : MainAppbar(),
-            // MainAppbar(),
+            appBar:
+                Provider.of<ScreenModel>(context, listen: false).isFullScreen ==
+                        true
+                    ? null
+                    : AppBar(
+                        backgroundColor: isDark ? colorBackGround : null,
+                        title: Center(
+                          child: Text(
+                            _selectedIndex == 0 ? 'Tv Shows' : 'Favorites',
+                          ),
+                        ),
+                        actions: [
+                          IconButton(
+                            iconSize: 20,
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Pick a color!'),
+                                    content: SingleChildScrollView(
+                                      child: BlockPicker(
+                                        pickerColor: pickerColor,
+                                        onColorChanged: changeColor,
+                                      ),
+                                    ),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                        child: const Text('Got it'),
+                                        onPressed: () {
+                                          setState(
+                                              () => currentColor = pickerColor);
+                                          Provider.of<ScreenModel>(context,
+                                                  listen: false)
+                                              .colorTheme = pickerColor;
+
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            icon: Icon(Icons.color_lens),
+                          ),
+                          IconButton(
+                            icon: isDark
+                                ? Icon(Icons.sunny)
+                                : Icon(Icons.nights_stay),
+                            onPressed: () {
+                              setState(() {
+                                MyApp(
+                                  initialIndex: _selectedIndex,
+                                ).toggleDarkMode();
+                              });
+                            },
+                          ),
+                        ],
+                      ),
             body: PageView(
               physics: BouncingScrollPhysics(),
               children: <Widget>[
@@ -91,7 +171,8 @@ class _MyAppState extends State<MyApp> {
                     icon: Icon(Icons.favorite), label: 'Favorites'),
               ],
               currentIndex: _selectedIndex,
-              selectedItemColor: Colors.purple[800],
+              selectedItemColor:
+                  Provider.of<ScreenModel>(context, listen: false).colorTheme,
               onTap: (index) {
                 setState(() {
                   _selectedIndex = index;
@@ -106,24 +187,65 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  AppBar MainAppbar() {
-    return AppBar(
-      title: Center(
-        child: Text(_selectedIndex == 0 ? 'Tv Shows' : 'Favorites'),
-      ),
-      backgroundColor: Colors.purple,
-      actions: [
-        IconButton(
-          icon: isDark ? Icon(Icons.sunny) : Icon(Icons.nights_stay),
-          onPressed: () {
-            setState(() {
-              MyApp(
-                initialIndex: _selectedIndex,
-              ).toggleDarkMode();
-            });
-          },
-        ),
-      ],
-    );
-  }
+  // AppBar MainAppbar() {
+  //   Color pickerColor =
+  //       Provider.of<ScreenModel>(context, listen: false).colorTheme;
+  //   Color currentColor =
+  //       Provider.of<ScreenModel>(context, listen: false).colorTheme;
+  //
+  //   void changeColor(Color color) {
+  //     setState(() => pickerColor = color);
+  //   }
+  //
+  //   return AppBar(
+  //     title: Center(
+  //       child: Text(_selectedIndex == 0 ? 'Tv Shows' : 'Favorites'),
+  //     ),
+  //     // backgroundColor: Colors.purple,
+  //     actions: [
+  //       IconButton(
+  //         icon: isDark ? Icon(Icons.sunny) : Icon(Icons.nights_stay),
+  //         onPressed: () {
+  //           setState(() {
+  //             MyApp(
+  //               initialIndex: _selectedIndex,
+  //             ).toggleDarkMode();
+  //           });
+  //         },
+  //       ),
+  //       IconButton(
+  //         onPressed: () {
+  //           showDialog(
+  //             context: context,
+  //             builder: (BuildContext context) {
+  //               return AlertDialog(
+  //                 title: const Text('Pick a color!'),
+  //                 content: SingleChildScrollView(
+  //                   child: BlockPicker(
+  //                     pickerColor: pickerColor,
+  //                     onColorChanged: changeColor,
+  //                   ),
+  //                 ),
+  //                 actions: <Widget>[
+  //                   ElevatedButton(
+  //                     child: const Text('Got it'),
+  //                     onPressed: () {
+  //                       setState(() => currentColor = pickerColor);
+  //                       print(pickerColor);
+  //                       Provider.of<ScreenModel>(context, listen: false)
+  //                           .colorTheme = pickerColor;
+  //
+  //                       Navigator.of(context).pop();
+  //                     },
+  //                   ),
+  //                 ],
+  //               );
+  //             },
+  //           );
+  //         },
+  //         icon: Icon(Icons.color_lens_outlined),
+  //       ),
+  //     ],
+  //   );
+  // }
 }
