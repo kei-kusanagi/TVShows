@@ -151,26 +151,53 @@ class ShowDetailPage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(15.0),
           child: LikeButton(
-            bubblesSize: 75,
+            bubblesSize: 80,
             animationDuration: const Duration(milliseconds: 1500),
             bubblesColor: isFavorite
-                ? const BubblesColor(
-                    dotPrimaryColor: Colors.purpleAccent,
-                    dotSecondaryColor: Colors.greenAccent)
+                ? BubblesColor(
+                    dotPrimaryColor:
+                        Provider.of<ScreenModel>(context).colorTheme,
+                    dotSecondaryColor: Colors.white)
                 : const BubblesColor(
-                    dotPrimaryColor: Colors.white,
-                    dotSecondaryColor: Colors.redAccent,
+                    dotPrimaryColor: Colors.grey,
+                    dotSecondaryColor: Colors.black,
                   ),
             likeBuilder: (isTapped) {
               return isFavorite
-                  ? const Icon(
-                      Icons.favorite,
-                      color: Colors.purple,
-                      size: 30,
+                  ? Stack(
+                      children: [
+                        Icon(Icons.favorite,
+                            size: 30,
+                            color:
+                                Provider.of<ScreenModel>(context).colorTheme),
+                        const Positioned(
+                          bottom: 1.0,
+                          top: 15.0,
+                          right: 0.0,
+                          left: 15.0,
+                          child: Icon(
+                            Icons.remove_circle,
+                            size: 13.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     )
-                  : const Icon(
-                      size: 30,
-                      Icons.favorite_border,
+                  : Stack(
+                      children: [
+                        const Icon(Icons.favorite_border, size: 30),
+                        Positioned(
+                          bottom: 1.0,
+                          top: 15.0,
+                          right: 0.0,
+                          left: 15.0,
+                          child: Icon(
+                            Icons.add_circle,
+                            size: 13.0,
+                            color: Provider.of<ScreenModel>(context).colorTheme,
+                          ),
+                        ),
+                      ],
                     );
             },
             onTap: (isLiked) async {

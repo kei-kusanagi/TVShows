@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:tv_show/main.dart';
 import '../sql/sql_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_color/flutter_color.dart';
 
 class Favorites extends StatefulWidget {
   const Favorites({Key? key}) : super(key: key);
@@ -100,7 +99,7 @@ class FavoritesState extends State<Favorites> {
 
   late String showName;
   deleteTVshow(context, id, showName, bool slidable) async {
-    if (Theme.of(context).platform != TargetPlatform.iOS) {
+    if (Theme.of(context).platform == TargetPlatform.iOS) {
       await showDialog(
         context: context,
         builder: (context) => CupertinoAlertDialog(
@@ -119,6 +118,7 @@ class FavoritesState extends State<Favorites> {
                       text: '$showName',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
+                          fontSize: 20.0,
                           color: Provider.of<ScreenModel>(context).colorTheme),
                     ),
                   ],
@@ -189,6 +189,7 @@ class FavoritesState extends State<Favorites> {
                       text: '$showName',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
+                          fontSize: 20.0,
                           color: Provider.of<ScreenModel>(context).colorTheme),
                     ),
                   ],
@@ -403,31 +404,34 @@ class FavoritesState extends State<Favorites> {
           child: LikeButton(
             bubblesSize: 75,
             animationDuration: const Duration(milliseconds: 1500),
-            bubblesColor: const BubblesColor(
-              dotPrimaryColor: Colors.red,
+            bubblesColor: BubblesColor(
+              dotPrimaryColor: Provider.of<ScreenModel>(context).colorTheme,
               dotSecondaryColor: Colors.white,
             ),
             likeBuilder: (isTapped) {
-              return Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 10,
-                      blurRadius: 5,
-                      offset:
-                          Offset(0, 3), // Cambia la dirección de la sombra aquí
-                    ),
-                  ],
-                ),
-                child: IconTheme(
+              return IconTheme(
                   data: IconThemeData(
                     color: Provider.of<ScreenModel>(context).colorTheme,
                     size: 30,
                   ),
-                  child: const Icon(Icons.delete_outlined),
-                ),
-              );
+                  child: Stack(
+                    children: [
+                      Icon(Icons.favorite,
+                          size: 30,
+                          color: Provider.of<ScreenModel>(context).colorTheme),
+                      const Positioned(
+                        bottom: 1.0,
+                        top: 15.0,
+                        right: 0.0,
+                        left: 15.0,
+                        child: Icon(
+                          Icons.remove_circle,
+                          size: 13.0,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ));
             },
             onTap: (isLiked) async {
               await deleteTVshow(

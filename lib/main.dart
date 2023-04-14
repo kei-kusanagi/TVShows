@@ -5,7 +5,6 @@ import 'package:tv_show/sql/sql_helper.dart';
 import 'screens/TvShowScreen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_color/flutter_color.dart';
 
 class ScreenModel extends ChangeNotifier {
   bool _isFullScreen = false;
