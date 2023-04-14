@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:tv_show/main.dart';
 import '../sql/sql_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_color/flutter_color.dart';
 
 class Favorites extends StatefulWidget {
   const Favorites({Key? key}) : super(key: key);
@@ -99,7 +100,7 @@ class FavoritesState extends State<Favorites> {
 
   late String showName;
   deleteTVshow(context, id, showName, bool slidable) async {
-    if (Theme.of(context).platform == TargetPlatform.iOS) {
+    if (Theme.of(context).platform != TargetPlatform.iOS) {
       await showDialog(
         context: context,
         builder: (context) => CupertinoAlertDialog(
@@ -116,9 +117,9 @@ class FavoritesState extends State<Favorites> {
                   children: <TextSpan>[
                     TextSpan(
                       text: '$showName',
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.purpleAccent),
+                          color: Provider.of<ScreenModel>(context).colorTheme),
                     ),
                   ],
                 ),
@@ -133,6 +134,9 @@ class FavoritesState extends State<Favorites> {
               },
               child: const Text(
                 'Cancel',
+                style: TextStyle(
+                  color: Colors.blue,
+                ),
               ),
             ),
             CupertinoDialogAction(
@@ -144,13 +148,16 @@ class FavoritesState extends State<Favorites> {
                       .isFullScreen = false;
                   favoritesFuture = SQLHelper.getFavorites();
                 });
+                Provider.of<ScreenModel>(context, listen: false).isFullScreen =
+                    false;
                 if (slidable == false) {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                        builder: (context) => MaterialApp(
-                                home: MyApp(
-                              initialIndex: 1,
-                            ))),
+                      builder: (context) => MaterialApp(
+                          home: MyApp(
+                        initialIndex: 1,
+                      )),
+                    ),
                   );
                 } else {
                   Navigator.pop(context);
@@ -180,9 +187,9 @@ class FavoritesState extends State<Favorites> {
                   children: <TextSpan>[
                     TextSpan(
                       text: '$showName',
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.purpleAccent),
+                          color: Provider.of<ScreenModel>(context).colorTheme),
                     ),
                   ],
                 ),
@@ -198,9 +205,15 @@ class FavoritesState extends State<Favorites> {
                   child: TextButton(
                     onPressed: () {
                       Navigator.pop(context);
+
+                      Provider.of(context)<ScreenModel>(context).isFullScreen =
+                          true;
                     },
                     child: const Text(
                       'Cancel',
+                      style: TextStyle(
+                        color: Colors.blue,
+                      ),
                     ),
                   ),
                 ),
@@ -213,6 +226,8 @@ class FavoritesState extends State<Favorites> {
                       });
                       if (slidable == false) {
                         Navigator.pop(context);
+                        Provider.of<ScreenModel>(context, listen: false)
+                            .isFullScreen = false;
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => MaterialApp(
@@ -228,7 +243,9 @@ class FavoritesState extends State<Favorites> {
                     },
                     child: const Text(
                       'Remove',
-                      style: TextStyle(color: Colors.red),
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
                     ),
                   ),
                 ),
@@ -248,7 +265,6 @@ class FavoritesState extends State<Favorites> {
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
               final double screenWidth = constraints.maxWidth;
-
               if (screenWidth > 600) {
                 // Pantalla grande
                 return Row(
@@ -392,17 +408,30 @@ class FavoritesState extends State<Favorites> {
               dotSecondaryColor: Colors.white,
             ),
             likeBuilder: (isTapped) {
-              return Icon(
-                Icons.delete,
-                color: Colors.red[800],
-                size: 30,
+              return Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 10,
+                      blurRadius: 5,
+                      offset:
+                          Offset(0, 3), // Cambia la dirección de la sombra aquí
+                    ),
+                  ],
+                ),
+                child: IconTheme(
+                  data: IconThemeData(
+                    color: Provider.of<ScreenModel>(context).colorTheme,
+                    size: 30,
+                  ),
+                  child: const Icon(Icons.delete_outlined),
+                ),
               );
             },
             onTap: (isLiked) async {
               await deleteTVshow(
                   context, showData['id'], showData['name'], false);
-              Provider.of<ScreenModel>(context, listen: false).isFullScreen =
-                  false;
               return true;
             },
           ),
